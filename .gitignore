@@ -1,0 +1,7 @@
+node_modules/
+credentials/
+.DS_Store
+
+# Redundância proposital: segredos nunca entram no git, mesmo se ficarem fora de credentials/
+config.json
+client_secret*.json

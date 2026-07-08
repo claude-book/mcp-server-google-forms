@@ -1,0 +1,752 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Revisão de código — MCP Google Forms</title>
+<style>
+  :root {
+    --bg: #FBFAFC;
+    --bg-raised: #F3F0F8;
+    --ink: #272134;
+    --ink-2: #5C546B;
+    --line: #E4DFEC;
+    --accent: #6C4BA6;
+    --mono-bg: #EFEBF6;
+    --grave: #B0352C;
+    --grave-bg: #F8ECEA;
+    --mod: #8F6400;
+    --mod-bg: #F6EFDC;
+    --leve: #3D6390;
+    --leve-bg: #E9EFF6;
+    --ok: #2F6B4F;
+    --ok-bg: #E8F1EC;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #17131E;
+      --bg-raised: #211B2D;
+      --ink: #ECE8F2;
+      --ink-2: #A79FB8;
+      --line: #332B44;
+      --accent: #B195DE;
+      --mono-bg: #272033;
+      --grave: #E4796F;
+      --grave-bg: #3A2321;
+      --mod: #D8A946;
+      --mod-bg: #372D16;
+      --leve: #88ABD8;
+      --leve-bg: #1F2A3B;
+      --ok: #7FBF9E;
+      --ok-bg: #1D3027;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #17131E;
+    --bg-raised: #211B2D;
+    --ink: #ECE8F2;
+    --ink-2: #A79FB8;
+    --line: #332B44;
+    --accent: #B195DE;
+    --mono-bg: #272033;
+    --grave: #E4796F;
+    --grave-bg: #3A2321;
+    --mod: #D8A946;
+    --mod-bg: #372D16;
+    --leve: #88ABD8;
+    --leve-bg: #1F2A3B;
+    --ok: #7FBF9E;
+    --ok-bg: #1D3027;
+  }
+  :root[data-theme="light"] {
+    --bg: #FBFAFC;
+    --bg-raised: #F3F0F8;
+    --ink: #272134;
+    --ink-2: #5C546B;
+    --line: #E4DFEC;
+    --accent: #6C4BA6;
+    --mono-bg: #EFEBF6;
+    --grave: #B0352C;
+    --grave-bg: #F8ECEA;
+    --mod: #8F6400;
+    --mod-bg: #F6EFDC;
+    --leve: #3D6390;
+    --leve-bg: #E9EFF6;
+    --ok: #2F6B4F;
+    --ok-bg: #E8F1EC;
+  }
+
+  html { background: var(--bg); }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Charter", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+    font-size: 1.04rem;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap {
+    max-width: 46rem;
+    margin: 0 auto;
+    padding: 3rem 1.4rem 4rem;
+  }
+  h1, h2, h3, .sans {
+    font-family: "Avenir Next", "Avenir", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  }
+  h1 {
+    font-size: clamp(1.65rem, 4.5vw, 2.25rem);
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+    margin: 0.4rem 0 0.6rem;
+    text-wrap: balance;
+  }
+  h2 {
+    font-size: 1.28rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 0;
+    text-wrap: balance;
+  }
+  h3 {
+    font-size: 1.12rem;
+    font-weight: 600;
+    line-height: 1.3;
+    margin: 0;
+    text-wrap: balance;
+  }
+  p { margin: 0; }
+  a { color: var(--accent); }
+
+  .eyebrow {
+    font-family: "Avenir Next", "Segoe UI", sans-serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .meta {
+    font-family: "Avenir Next", "Segoe UI", sans-serif;
+    font-size: 0.86rem;
+    color: var(--ink-2);
+  }
+
+  header.page { display: flex; flex-direction: column; gap: 0.35rem; }
+  .verdict { margin-top: 1.1rem; max-width: 62ch; }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.7rem;
+    margin-top: 1.6rem;
+  }
+  .stat {
+    background: var(--bg-raised);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 0.8rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+  .stat .n {
+    font-family: "Avenir Next", "Segoe UI", sans-serif;
+    font-size: 1.7rem;
+    font-weight: 600;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .stat .lbl {
+    font-family: "Avenir Next", "Segoe UI", sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .stat.grave .n, .stat.grave .lbl { color: var(--grave); }
+  .stat.mod .n, .stat.mod .lbl { color: var(--mod); }
+  .stat.leve .n, .stat.leve .lbl { color: var(--leve); }
+  .verify-line { margin-top: 0.8rem; }
+
+  .dot {
+    width: 0.55em; height: 0.55em;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+  .dot.grave { background: var(--grave); }
+  .dot.mod { background: var(--mod); }
+  .dot.leve { background: var(--leve); }
+
+  aside.method {
+    margin-top: 2.4rem;
+    background: var(--bg-raised);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 1.1rem 1.25rem 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+  }
+  aside.method p { font-size: 0.97rem; max-width: 62ch; }
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.2rem;
+    margin-top: 0.2rem;
+  }
+  .legend span {
+    font-family: "Avenir Next", "Segoe UI", sans-serif;
+    font-size: 0.84rem;
+    color: var(--ink-2);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  section.group { margin-top: 3rem; }
+  .group-head {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    padding-bottom: 0.7rem;
+    border-bottom: 2px solid var(--line);
+  }
+  .group-head .dot { transform: translateY(-0.1em); }
+  .group-head h2 { display: inline; }
+  .group-head .def {
+    font-family: "Avenir Next", "Segoe UI", sans-serif;
+    font-size: 0.86rem;
+    color: var(--ink-2);
+  }
+  .group.g-grave .group-head { border-bottom-color: color-mix(in srgb, var(--grave) 45%, var(--line)); }
+  .group.g-mod .group-head { border-bottom-color: color-mix(in srgb, var(--mod) 45%, var(--line)); }
+  .group.g-leve .group-head { border-bottom-color: color-mix(in srgb, var(--leve) 45%, var(--line)); }
+
+  article.finding {
+    padding: 1.7rem 0 1.9rem;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+  }
+  article.finding:last-child { border-bottom: none; }
+
+  .f-head {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.9rem;
+    align-items: start;
+  }
+  .f-num {
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--ink-2);
+    padding-top: 0.15rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .f-titles { display: flex; flex-direction: column; gap: 0.55rem; }
+  .chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .chip {
+    font-family: "Avenir Next", "Segoe UI", sans-serif;
+    font-size: 0.74rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    padding: 0.14rem 0.6rem;
+    border-radius: 99px;
+    white-space: nowrap;
+  }
+  .chip.sev-grave { background: var(--grave-bg); color: var(--grave); }
+  .chip.sev-mod { background: var(--mod-bg); color: var(--mod); }
+  .chip.sev-leve { background: var(--leve-bg); color: var(--leve); }
+  .chip.verdict-c { background: var(--bg-raised); border: 1px solid var(--line); color: var(--ink-2); }
+  .chip.verdict-p { background: transparent; border: 1px dashed var(--line); color: var(--ink-2); }
+  code.chip.file {
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+    font-weight: 500;
+    background: var(--mono-bg);
+    color: var(--ink-2);
+    letter-spacing: 0;
+  }
+
+  .plain { max-width: 64ch; }
+  .plain strong {
+    font-family: "Avenir Next", "Segoe UI", sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+    display: block;
+    margin-bottom: 0.15rem;
+  }
+
+  details.tech {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--bg-raised);
+    overflow: hidden;
+  }
+  details.tech summary {
+    font-family: "Avenir Next", "Segoe UI", sans-serif;
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: var(--accent);
+    padding: 0.65rem 1rem;
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    user-select: none;
+  }
+  details.tech summary::-webkit-details-marker { display: none; }
+  details.tech summary::before {
+    content: "";
+    width: 0.42em; height: 0.42em;
+    border-right: 2px solid var(--accent);
+    border-bottom: 2px solid var(--accent);
+    transform: rotate(-45deg);
+    flex-shrink: 0;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    details.tech summary::before { transition: transform 0.15s ease; }
+  }
+  details.tech[open] summary::before { transform: rotate(45deg); }
+  details.tech summary:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+    border-radius: 10px;
+  }
+  .tech-body {
+    padding: 0.2rem 1rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    border-top: 1px solid var(--line);
+    padding-top: 0.85rem;
+  }
+  .tech-body p {
+    font-size: 0.92rem;
+    line-height: 1.6;
+    color: var(--ink-2);
+    max-width: 68ch;
+    overflow-wrap: anywhere;
+  }
+  .tech-body p strong {
+    font-family: "Avenir Next", "Segoe UI", sans-serif;
+    font-size: 0.74rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink);
+    display: block;
+    margin-bottom: 0.1rem;
+  }
+  .tech-body code {
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+    font-size: 0.85em;
+    background: var(--mono-bg);
+    padding: 0.05em 0.35em;
+    border-radius: 4px;
+    overflow-wrap: anywhere;
+  }
+
+  section.minor { margin-top: 3rem; }
+  section.minor .group-head { border-bottom-color: var(--line); }
+  ul.minor-list {
+    margin: 1.2rem 0 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  ul.minor-list li {
+    max-width: 66ch;
+    padding-left: 1.1rem;
+    position: relative;
+  }
+  ul.minor-list li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.62em;
+    width: 0.38em; height: 0.38em;
+    border-radius: 50%;
+    background: var(--line);
+  }
+  ul.minor-list.discarded li::before { background: var(--ok); }
+  ul.minor-list li em.note {
+    font-style: normal;
+    font-family: "Avenir Next", "Segoe UI", sans-serif;
+    font-size: 0.8rem;
+    color: var(--ok);
+    font-weight: 600;
+  }
+
+  section.next {
+    margin-top: 3rem;
+    background: var(--bg-raised);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 1.3rem 1.4rem 1.4rem;
+  }
+  section.next ol {
+    margin: 0.8rem 0 0;
+    padding-left: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+  }
+  section.next li { max-width: 62ch; }
+
+  footer.page {
+    margin-top: 3rem;
+    padding-top: 1.2rem;
+    border-top: 1px solid var(--line);
+  }
+
+  @media (max-width: 540px) {
+    .stats { grid-template-columns: 1fr; }
+    .f-head { grid-template-columns: 1fr; gap: 0.3rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="page">
+    <span class="eyebrow">Relatório de revisão de código · nível high</span>
+    <h1>Servidor MCP — Google Forms</h1>
+    <p class="meta">10 achados relevantes · 8 de julho de 2026 · revisão automatizada multi-agente (Claude Code)</p>
+    <p class="meta"><strong>Nota:</strong> este relatório é o retrato da revisão em 08/07/2026, feita <em>antes</em> das correções — os itens abaixo foram tratados na v0.3.0. O status atualizado de cada um está em docs/revisao-de-codigo.md.</p>
+    <p class="verdict">O código é bem construído e organizado, e nada do que foi encontrado impede o uso imediato. Ainda assim, <strong>três problemas graves merecem correção prioritária</strong>: um comando de apagar que pode acertar o item errado, a impossibilidade de receber respostas sem uma etapa manual, e uma autorização que pode "dar certo" pela metade sem avisar.</p>
+
+    <div class="stats">
+      <div class="stat grave"><span class="n">3</span><span class="lbl"><span class="dot grave"></span>Graves</span></div>
+      <div class="stat mod"><span class="n">5</span><span class="lbl"><span class="dot mod"></span>Moderados</span></div>
+      <div class="stat leve"><span class="n">2</span><span class="lbl"><span class="dot leve"></span>Leves</span></div>
+    </div>
+  </header>
+
+  <aside class="method">
+    <span class="eyebrow">Como esta revisão foi feita</span>
+    <p>Sete programas revisores independentes vasculharam o código, cada um procurando um tipo diferente de problema, e levantaram <strong>33 suspeitas</strong>. Removendo repetições, <strong>24 suspeitas únicas</strong> foram entregues a verificadores independentes, que tentaram provar ou derrubar cada uma: <strong>15 foram confirmadas, 7 consideradas prováveis e 2 descartadas</strong>. As 10 mais importantes estão neste relatório; o restante aparece resumido ao final.</p>
+    <div class="legend">
+      <span><strong>Confirmado</strong>&nbsp;= comprovado no código ou na documentação oficial</span>
+      <span><strong>Plausível</strong>&nbsp;= provável, mas depende de condições difíceis de reproduzir</span>
+    </div>
+  </aside>
+
+  <!-- ============ GRAVES ============ -->
+  <section class="group g-grave">
+    <div class="group-head">
+      <span class="dot grave"></span>
+      <h2>Graves</h2>
+      <span class="def">— podem causar perda de conteúdo ou impedir o objetivo principal</span>
+    </div>
+
+    <article class="finding" id="f01">
+      <div class="f-head">
+        <span class="f-num">01</span>
+        <div class="f-titles">
+          <h3>Apagar ou mover perguntas pode acertar o item errado</h3>
+          <div class="chips">
+            <span class="chip sev-grave">Grave</span>
+            <span class="chip verdict-c">Confirmado</span>
+            <code class="chip file">src/server.js:179</code>
+          </div>
+        </div>
+      </div>
+      <p class="plain"><strong>Em palavras simples</strong>Um formulário do Google pode conter, além de perguntas, títulos de seção, imagens e quebras de página. As ferramentas de apagar e mover contam as posições considerando <em>tudo isso</em> — mas a instrução exibida diz "posição da pergunta". E o servidor não confere o que existe na posição antes de agir.</p>
+      <p class="plain"><strong>Consequência</strong>Você pede para apagar "a primeira pergunta" e o servidor pode apagar outra coisa — um cabeçalho, uma imagem — sem avisar e sem como desfazer. Posições inexistentes (números negativos ou grandes demais) também passam direto e voltam como erro técnico do Google.</p>
+      <details class="tech">
+        <summary>Texto técnico</summary>
+        <div class="tech-body">
+          <p><strong>Resumo</strong><code>delete_question</code> e <code>move_question</code> documentam o índice como "posição da pergunta", mas a API o trata como posição bruta de qualquer item (blocos de texto, imagens e quebras de página contam) e não há validação de limites — o item errado pode ser apagado/movido silenciosamente.</p>
+          <p><strong>Cenário de falha</strong>Formulário com um bloco de texto na posição 0 e a primeira pergunta na posição 1: <code>delete_question</code> com <code>index=0</code> apaga o bloco de texto, não a pergunta — sem erro e sem confirmar o que havia na posição. Índices negativos ou fora do intervalo (schema <code>z.number().int()</code> sem <code>.min/.max</code>) vão direto à API e voltam como 400 cru.</p>
+        </div>
+      </details>
+    </article>
+
+    <article class="finding" id="f02">
+      <div class="f-head">
+        <span class="f-num">02</span>
+        <div class="f-titles">
+          <h3>Formulários criados não conseguem receber respostas sem etapa manual</h3>
+          <div class="chips">
+            <span class="chip sev-grave">Grave</span>
+            <span class="chip verdict-c">Confirmado</span>
+            <code class="chip file">src/server.js:85</code>
+          </div>
+        </div>
+      </div>
+      <p class="plain"><strong>Em palavras simples</strong>Desde 30/06/2026, todo formulário criado por programa nasce como <em>rascunho não publicado</em> — ninguém consegue respondê-lo até que seja publicado. O servidor não tem nenhum comando para publicar.</p>
+      <p class="plain"><strong>Consequência</strong>O fluxo completo que o servidor promete — criar o formulário, compartilhar o link e ler as respostas — nunca se completa sozinho. Você envia o link, as pessoas não conseguem responder, e a leitura de respostas retorna sempre "Nenhuma resposta ainda". A única saída hoje é publicar manualmente no site do Google Forms.</p>
+      <details class="tech">
+        <summary>Texto técnico</summary>
+        <div class="tech-body">
+          <p><strong>Resumo</strong>Não existe ferramenta para publicar o formulário (<code>forms.setPublishSettings</code>), mas desde 30/06/2026 formulários criados via API nascem despublicados — o fluxo anunciado criar → compartilhar → ler respostas não fecha usando só o servidor.</p>
+          <p><strong>Cenário de falha</strong>Usuário roda <code>create_form</code> + <code>add_question</code> e compartilha o <code>responderUri</code>; respondentes não conseguem enviar (formulário despublicado) e <code>list_responses</code> retorna para sempre "Nenhuma resposta ainda". Verificado na documentação do Google que <code>setPublishSettings</code> é o método necessário.</p>
+        </div>
+      </details>
+    </article>
+
+    <article class="finding" id="f03">
+      <div class="f-head">
+        <span class="f-num">03</span>
+        <div class="f-titles">
+          <h3>A autorização pode "dar certo" faltando a peça principal</h3>
+          <div class="chips">
+            <span class="chip sev-grave">Grave</span>
+            <span class="chip verdict-c">Confirmado</span>
+            <code class="chip file">scripts/get-token.js:54</code>
+          </div>
+        </div>
+      </div>
+      <p class="plain"><strong>Em palavras simples</strong>No passo de autorização com o Google, às vezes o Google não devolve a "chave de renovação" (refresh token) — a peça que permite ao servidor trabalhar sem pedir login toda hora. O script grava o arquivo de configuração sem essa chave e, mesmo assim, mostra "Autorização concluída!".</p>
+      <p class="plain"><strong>Consequência</strong>É como instalar uma fechadura nova, receber o aviso "instalação concluída" — e descobrir depois que a chave não veio na caixa. Tudo parece pronto, mas qualquer uso do servidor falha dali em diante, com uma mensagem que não explica que o problema nasceu na autorização.</p>
+      <details class="tech">
+        <summary>Texto técnico</summary>
+        <div class="tech-body">
+          <p><strong>Resumo</strong>Se o Google não retornar <code>refresh_token</code>, o script grava <code>config.json</code> sem o campo (<code>JSON.stringify</code> descarta <code>undefined</code>) e ainda imprime "Autorização concluída" — sucesso silencioso que deixa o servidor inutilizável.</p>
+          <p><strong>Cenário de falha</strong>Google omite o refresh_token (raro mas documentado, mesmo com <code>prompt:'consent'</code> — p.ex. políticas de workspace ou corrida de reautorização); o usuário vê "Pronto. refreshToken salvo", mas toda chamada de ferramenta passa a falhar com "Falta o refreshToken em credentials/config.json".</p>
+        </div>
+      </details>
+    </article>
+  </section>
+
+  <!-- ============ MODERADOS ============ -->
+  <section class="group g-mod">
+    <div class="group-head">
+      <span class="dot mod"></span>
+      <h2>Moderados</h2>
+      <span class="def">— atrapalham o uso, confundem ou deixam tudo mais lento</span>
+    </div>
+
+    <article class="finding" id="f04">
+      <div class="f-head">
+        <span class="f-num">04</span>
+        <div class="f-titles">
+          <h3>Pergunta valendo pontos é recusada se o "modo prova" não estiver ligado</h3>
+          <div class="chips">
+            <span class="chip sev-mod">Moderado</span>
+            <span class="chip verdict-c">Confirmado</span>
+            <code class="chip file">src/server.js:53</code>
+          </div>
+        </div>
+      </div>
+      <p class="plain"><strong>Em palavras simples</strong>Para uma pergunta valer pontos, o formulário precisa antes estar em "modo quiz" (há um comando para isso: <code style="font-size:0.85em">set_quiz</code>). Só que a ferramenta de adicionar pergunta não avisa dessa exigência nem ativa o modo sozinha.</p>
+      <p class="plain"><strong>Consequência</strong>O caminho mais natural — criar um formulário e já adicionar uma pergunta valendo 1 ponto — termina num erro técnico em inglês, sem dica de que bastava ligar o modo quiz primeiro.</p>
+      <details class="tech">
+        <summary>Texto técnico</summary>
+        <div class="tech-body">
+          <p><strong>Resumo</strong><code>add_question</code> anexa <code>grading</code> sempre que <code>points</code> é numérico, sem verificar/ativar o modo quiz; a API rejeita grading em formulário não-quiz, e a descrição da ferramenta não avisa que <code>set_quiz</code> precisa vir antes.</p>
+          <p><strong>Cenário de falha</strong>Fluxo natural <code>create_form</code> → <code>add_question</code> com <code>points:1</code> → <code>batchUpdate</code> retorna 400 INVALID_ARGUMENT ("grading properties can only be added to questions in forms configured as quizzes"), exposto cru ao cliente MCP.</p>
+        </div>
+      </details>
+    </article>
+
+    <article class="finding" id="f05">
+      <div class="f-head">
+        <span class="f-num">05</span>
+        <div class="f-titles">
+          <h3>A janela de autorização fica sem proteção contra intrusos</h3>
+          <div class="chips">
+            <span class="chip sev-mod">Moderado</span>
+            <span class="chip verdict-p">Plausível</span>
+            <code class="chip file">scripts/get-token.js:45</code>
+          </div>
+        </div>
+      </div>
+      <p class="plain"><strong>Em palavras simples</strong>Durante a autorização, o script abre uma "porta de retorno" no seu computador para receber a confirmação do Google. Essa porta aceita qualquer confirmação que chegue, sem conferir se ela veio mesmo do processo que <em>você</em> iniciou — uma checagem de segurança padrão (chamada <em>state</em>) que ficou de fora.</p>
+      <p class="plain"><strong>Consequência</strong>Num cenário raro — uma página maliciosa aberta no navegador exatamente durante esses segundos — o servidor poderia acabar conectado à conta Google <em>de outra pessoa</em>, sem você perceber. A probabilidade é baixa, mas a proteção é simples e padrão.</p>
+      <details class="tech">
+        <summary>Texto técnico</summary>
+        <div class="tech-body">
+          <p><strong>Resumo</strong>O callback OAuth em <code>localhost:4571</code> aceita qualquer <code>?code=</code> sem validar um parâmetro <code>state</code> (sem proteção contra CSRF/injeção de código de autorização).</p>
+          <p><strong>Cenário de falha</strong>Enquanto o servidor local escuta, uma página maliciosa pode requisitar <code>http://localhost:4571/?code=CODIGO_DO_ATACANTE</code>; o script troca o código e grava o refreshToken de uma conta controlada pelo atacante. Janela curta e exige código válido para o mesmo client_id — mas a mitigação (state aleatório verificado no callback) é padrão e barata.</p>
+        </div>
+      </details>
+    </article>
+
+    <article class="finding" id="f06">
+      <div class="f-head">
+        <span class="f-num">06</span>
+        <div class="f-titles">
+          <h3>Respostas com arquivos enviados aparecem em branco</h3>
+          <div class="chips">
+            <span class="chip sev-mod">Moderado</span>
+            <span class="chip verdict-c">Confirmado</span>
+            <code class="chip file">src/server.js:233</code>
+          </div>
+        </div>
+      </div>
+      <p class="plain"><strong>Em palavras simples</strong>O leitor de respostas só sabe exibir respostas de texto. Se o formulário tiver uma pergunta de "envio de arquivo" (possível quando ele é criado ou editado no site do Forms), essas respostas aparecem simplesmente vazias.</p>
+      <p class="plain"><strong>Consequência</strong>Você olha o relatório de respostas e conclui que ninguém anexou nada — quando na verdade anexaram. A informação existe, mas fica invisível, sem qualquer aviso.</p>
+      <details class="tech">
+        <summary>Texto técnico</summary>
+        <div class="tech-body">
+          <p><strong>Resumo</strong><code>list_responses</code> só renderiza <code>textAnswers</code>; respostas de upload de arquivo (<code>fileUploadAnswers</code>) — possíveis em formulários criados/editados na UI — aparecem como valor vazio, ocultando conteúdo enviado.</p>
+          <p><strong>Cenário de falha</strong>Formulário criado na UI com pergunta de upload é lido via <code>list_responses</code>: cada resposta imprime "- &lt;pergunta&gt;:" vazio, sem indicar que existe um arquivo enviado que não está sendo exibido.</p>
+        </div>
+      </details>
+    </article>
+
+    <article class="finding" id="f07">
+      <div class="f-head">
+        <span class="f-num">07</span>
+        <div class="f-titles">
+          <h3>Quando algo falha, a mensagem é "tecniquês" sem instrução</h3>
+          <div class="chips">
+            <span class="chip sev-mod">Moderado</span>
+            <span class="chip verdict-c">Confirmado</span>
+            <code class="chip file">src/server.js:76</code>
+          </div>
+        </div>
+      </div>
+      <p class="plain"><strong>Em palavras simples</strong>Quando algo dá errado — permissão expirada, formulário que não existe, limite de uso do Google, arquivo de configuração corrompido — o servidor repassa o erro cru, em inglês técnico, em vez de traduzir para uma instrução ("rode npm run token de novo", "confira o ID do formulário").</p>
+      <p class="plain"><strong>Consequência</strong>Você não consegue distinguir um problema que se resolve em um minuto (reautorizar) de um defeito real, nem sabe qual o próximo passo. Curiosamente, algumas mensagens do próprio código já são amigáveis e em português — o tratamento é desigual.</p>
+      <details class="tech">
+        <summary>Texto técnico</summary>
+        <div class="tech-body">
+          <p><strong>Resumo</strong>Nenhum dos 7 handlers tem try/catch nem existe camada de tradução de erros: falhas da API do Google (401/403/404/429) e <code>config.json</code> corrompido (<code>JSON.parse</code> da linha 20) chegam ao cliente MCP como mensagens cruas.</p>
+          <p><strong>Cenário de falha</strong>Refresh token revogado → toda ferramenta responde "invalid_grant" cru em vez de "reautorize com npm run token"; config truncado → "Unexpected end of JSON input". Confirmado no SDK (<code>mcp.js:135-162</code>) que a mensagem do throw vai verbatim ao cliente; um wrapper único cobriria os 7 handlers.</p>
+        </div>
+      </details>
+    </article>
+
+    <article class="finding" id="f08">
+      <div class="f-head">
+        <span class="f-num">08</span>
+        <div class="f-titles">
+          <h3>A cada comando, o servidor refaz o "login" do zero</h3>
+          <div class="chips">
+            <span class="chip sev-mod">Moderado</span>
+            <span class="chip verdict-c">Confirmado</span>
+            <code class="chip file">src/server.js:16</code>
+          </div>
+        </div>
+      </div>
+      <p class="plain"><strong>Em palavras simples</strong>Em vez de guardar a conexão com o Google e reaproveitá-la, o servidor a reconstrói inteira a cada comando — relê o arquivo de credenciais do disco e pede um "crachá de acesso" novo ao Google toda vez.</p>
+      <p class="plain"><strong>Consequência</strong>Cada comando fica de 0,1 a 0,3 segundo mais lento do que precisaria, e sequências rápidas de comandos podem esbarrar no limite de pedidos do Google, travando todas as ferramentas temporariamente.</p>
+      <details class="tech">
+        <summary>Texto técnico</summary>
+        <div class="tech-body">
+          <p><strong>Resumo</strong><code>getFormsClient()</code> relê/parseia <code>config.json</code> (I/O síncrono) e cria um OAuth2 client novo a cada chamada, zerando o cache de access token — cada invocação paga uma troca refresh→access token extra.</p>
+          <p><strong>Cenário de falha</strong>Todo tool call faz um round-trip HTTPS extra a <code>oauth2.googleapis.com</code> que um cliente memoizado evitaria (comprovado em <code>oauth2client.js:348</code>: o token só é reutilizado se já estiver na instância); sequências rápidas podem esbarrar em rate limit do endpoint de token.</p>
+        </div>
+      </details>
+    </article>
+  </section>
+
+  <!-- ============ LEVES ============ -->
+  <section class="group g-leve">
+    <div class="group-head">
+      <span class="dot leve"></span>
+      <h2>Leves</h2>
+      <span class="def">— incômodos pequenos ou situações raras</span>
+    </div>
+
+    <article class="finding" id="f09">
+      <div class="f-head">
+        <span class="f-num">09</span>
+        <div class="f-titles">
+          <h3>Se a porta 4571 estiver ocupada, a autorização quebra sem explicação</h3>
+          <div class="chips">
+            <span class="chip sev-leve">Leve</span>
+            <span class="chip verdict-c">Confirmado</span>
+            <code class="chip file">scripts/get-token.js:70</code>
+          </div>
+        </div>
+      </div>
+      <p class="plain"><strong>Em palavras simples</strong>O passo de autorização usa um "canal" fixo do computador (a porta 4571). Se outro programa já estiver usando esse canal, o script morre com uma tela de erro técnica, em vez de avisar o que houve ou tentar outro canal.</p>
+      <p class="plain"><strong>Consequência</strong>Situação rara e restrita ao passo de configuração (que roda uma vez) — mas, quando acontece, não há qualquer pista de como resolver. Um canal automático resolveria sem nenhuma configuração extra.</p>
+      <details class="tech">
+        <summary>Texto técnico</summary>
+        <div class="tech-body">
+          <p><strong>Resumo</strong><code>httpServer.listen(4571)</code> não tem listener de <code>'error'</code>: porta ocupada (EADDRINUSE) vira exceção não tratada com stack trace cru; porta fixa, sem override por env nem fallback.</p>
+          <p><strong>Cenário de falha</strong>Outro processo segurando a 4571 → o fluxo de autorização morre em crash bruto. Como clientes OAuth "Desktop app" aceitam redirect de loopback em qualquer porta, usar porta efêmera (<code>listen(0)</code>) resolveria sem reconfigurar nada no Google Cloud.</p>
+        </div>
+      </details>
+    </article>
+
+    <article class="finding" id="f10">
+      <div class="f-head">
+        <span class="f-num">10</span>
+        <div class="f-titles">
+          <h3>Para cada pergunta adicionada, o servidor baixa o formulário inteiro</h3>
+          <div class="chips">
+            <span class="chip sev-leve">Leve</span>
+            <span class="chip verdict-c">Confirmado</span>
+            <code class="chip file">src/server.js:128</code>
+          </div>
+        </div>
+      </div>
+      <p class="plain"><strong>Em palavras simples</strong>Antes de adicionar uma pergunta, o servidor baixa o formulário completo só para contar quantos itens ele tem (e assim saber onde encaixar a nova pergunta: no final).</p>
+      <p class="plain"><strong>Consequência</strong>Cada pergunta adicionada custa o dobro do trabalho e do tempo. E há uma janela de risco: se alguém estiver editando o formulário no navegador no mesmo instante, a contagem fica defasada e a pergunta pode entrar na posição errada.</p>
+      <details class="tech">
+        <summary>Texto técnico</summary>
+        <div class="tech-body">
+          <p><strong>Resumo</strong><code>add_question</code> baixa o formulário inteiro (<code>forms.get</code>) só para calcular <code>items.length</code> — 2 chamadas de API por pergunta, com janela TOCTOU em que edições concorrentes deslocam o índice calculado.</p>
+          <p><strong>Cenário de falha</strong>Adicionar N perguntas custa 2N chamadas (dobro de quota e latência); edição concorrente na UI entre o get e o batchUpdate posiciona a pergunta errado. Um parâmetro de índice opcional ou contagem em cache elimina o get; nota verificada: a API exige <code>location.index</code>, então simplesmente omitir não é alternativa.</p>
+        </div>
+      </details>
+    </article>
+  </section>
+
+  <!-- ============ ABAIXO DO CORTE ============ -->
+  <section class="minor">
+    <div class="group-head">
+      <h2>Itens menores, abaixo do corte</h2>
+      <span class="def">— verificados e reais, mas de baixa prioridade</span>
+    </div>
+    <ul class="minor-list">
+      <li>A página "Autorização concluída!" pode nem chegar a aparecer no navegador, porque o programa se encerra rápido demais — a autorização funciona mesmo assim, mas <em>parece</em> ter falhado.</li>
+      <li>A abertura automática do navegador na autorização só funciona no Mac (no seu caso, sem impacto; em outros sistemas, a pessoa precisa copiar o link exibido no terminal).</li>
+      <li>O projeto declara duas versões diferentes de si mesmo: 0.1.0 no <code style="font-size:0.85em">package.json</code> e 0.2.0 no servidor.</li>
+      <li>Trechos idênticos repetidos: o "envelope" da resposta aparece escrito 8 vezes e a chamada de atualização, 4 — um ajudante único deixaria a manutenção mais segura.</li>
+      <li>Existe uma biblioteca oficial do Google (<code style="font-size:0.85em">@google-cloud/local-auth</code>) que faria a autorização inteira com menos código — e de quebra resolveria os itens 05 e 09.</li>
+      <li>O README ensina a instalação usando um caminho fixo da sua máquina (aceitável para uso pessoal; quebraria para qualquer outra pessoa).</li>
+      <li>Adicionar um novo tipo de pergunta exige alterar três lugares diferentes do código que precisam ficar sempre em sincronia.</li>
+      <li>Não há como <em>editar</em> uma pergunta existente: corrigir uma pontuação exige apagar e recriar, perdendo o vínculo com respostas já recebidas.</li>
+      <li>O arquivo de configuração guarda cópias de dados que já existem no arquivo baixado do Google — se você trocar o segredo lá, a cópia velha continua sendo usada em silêncio.</li>
+    </ul>
+  </section>
+
+  <!-- ============ DESCARTADOS ============ -->
+  <section class="minor">
+    <div class="group-head">
+      <h2>Suspeitas descartadas na verificação</h2>
+      <span class="def">— pareciam problemas, mas não eram</span>
+    </div>
+    <ul class="minor-list discarded">
+      <li><em class="note">Descartado.</em> "Remover uma checagem aparentemente inútil de tipo de pergunta" — a checagem é uma proteção legítima contra erros futuros, não código morto.</li>
+      <li><em class="note">Descartado.</em> "Simplificar a linha que define o nome do arquivo no Drive" — a linha é necessária: sem ela, os formulários apareceriam no Drive como <em>"Untitled form"</em>. A "simplificação" criaria um problema novo.</li>
+    </ul>
+  </section>
+
+  <!-- ============ PRÓXIMOS PASSOS ============ -->
+  <section class="next">
+    <span class="eyebrow">Próximos passos sugeridos</span>
+    <ol>
+      <li><strong>Corrigir os 3 graves</strong> (itens 01–03): validação de posições, uma ferramenta de publicação e a checagem da chave de renovação na autorização.</li>
+      <li><strong>Atacar os moderados em bloco</strong>: um único "tradutor de erros" resolve o item 07 para as 7 ferramentas; adotar a biblioteca oficial do Google resolve 05 e 09 juntos; guardar a conexão resolve o 08.</li>
+      <li><strong>Leves e itens menores</strong> são opcionais — bons de incluir se o servidor for crescer ou ser compartilhado.</li>
+    </ol>
+  </section>
+
+  <footer class="page">
+    <p class="meta">Relatório gerado por Claude Code em 8 de julho de 2026 · Projeto: <code style="font-size:0.9em">Google_MCP</code> · Escopo: todo o código (revisão inicial, sem commits anteriores) · Metodologia: 7 buscadores independentes + verificação adversarial individual de cada suspeita.</p>
+  </footer>
+
+</div>
+</body>
+</html>
