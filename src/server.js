@@ -41,16 +41,22 @@ function getFormsClient() {
 }
 
 // --- Tradução de erros ------------------------------------------------------
+// Erro de autenticação = refresh token inválido/revogado ou acesso negado (401).
+function isAuthError(e) {
+  const data = e?.response?.data;
+  const raw = data?.error_description || data?.error?.message || e?.message || "";
+  return (e?.response?.status ?? e?.code) === 401 || String(data?.error || raw).includes("invalid_grant");
+}
+
 // Converte erros da API do Google em mensagens acionáveis para quem usa a
 // ferramenta, em vez de repassar stack traces e códigos crus.
 function friendlyError(e) {
   const data = e?.response?.data;
   const raw = data?.error_description || data?.error?.message || e?.message || String(e);
   const status = e?.response?.status ?? e?.code;
-  if (String(data?.error || raw).includes("invalid_grant")) {
+  if (isAuthError(e)) {
     return "Credenciais expiradas ou revogadas pelo Google. Rode 'npm run token' para autorizar de novo.";
   }
-  if (status === 401) return "Não autorizado pelo Google. Rode 'npm run token' para autorizar de novo.";
   if (status === 403) return `Sem permissão para esta operação. Verifique se a API do Google Forms está ativada no projeto do Google Cloud e se o formulário pertence à sua conta. Detalhe: ${raw}`;
   if (status === 404) return "Formulário não encontrado — confira o formId.";
   if (status === 429) return "Limite de uso da API do Google atingido. Aguarde alguns instantes e tente novamente.";
@@ -124,11 +130,21 @@ const server = new McpServer({ name: "google-forms", version: pkg.version });
 
 // Registra uma ferramenta com tratamento de erro uniforme: qualquer exceção
 // vira uma mensagem amigável em vez de um erro cru para o cliente MCP.
+// Em erro de autenticação, descarta o cliente memoizado e tenta UMA vez com o
+// config atual — cobre o caso de 'npm run token' rodar com o servidor aberto.
 function tool(name, def, handler) {
   server.registerTool(name, def, async (args) => {
     try {
       return await handler(args);
     } catch (e) {
+      if (isAuthError(e)) {
+        formsClient = null;
+        try {
+          return await handler(args);
+        } catch (e2) {
+          return fail(friendlyError(e2));
+        }
+      }
       return fail(friendlyError(e));
     }
   });

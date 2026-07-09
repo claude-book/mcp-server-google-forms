@@ -227,3 +227,13 @@ Revisão `/code-review high` executada (este documento). À época, todos os 10 
 - **Decisão registrada:** mantivemos o fluxo OAuth próprio (corrigido) em vez de adotar `@google-cloud/local-auth`, porque a biblioteca não expõe `prompt: "consent"` — re-autorizações poderiam vir sem refresh_token, recriando o achado 03.
 
 **Verificação:** `node --check` nos dois arquivos + handshake MCP real via stdio (`initialize` + `tools/list`), confirmando as 8 ferramentas e a versão 0.3.0 no `serverInfo`.
+
+### 08/07/2026 — Teste de ponta a ponta com a API real (v0.3.1)
+
+**O que foi testado (contra a API real do Google Forms, com formulário de verdade):** criar formulário; guarda de pontos-sem-quiz (recusou com instrução ✔); modo quiz liga/desliga ✔; adicionar, mover e apagar perguntas com as mensagens nomeando o item afetado ✔; guardas de posição inexistente (mensagem amigável, sem 400 cru ✔); **publicar e despublicar com `set_publish` ✔** — fechando na prática o achado 02; `list_responses` vazio com dica de publicação ✔; e o novo `get-token.js` (parâmetro `state` presente na URL ✔, porta dinâmica em vez da 4571 fixa ✔).
+
+**Bug descoberto e corrigido durante o teste (v0.3.1):** com o cliente memoizado (correção do achado 08), um servidor **em execução** continuava usando o refresh token antigo mesmo depois de `npm run token` — a mensagem de erro mandava reautorizar, mas reautorizar não resolvia até reiniciar o servidor, contradizendo a própria instrução. Correção em `src/server.js`: ao detectar erro de autenticação (`isAuthError`), o wrapper descarta o cliente memoizado e repete a operação uma única vez com o config recarregado. Reautorizar passou a valer imediatamente, sem reiniciar nada.
+
+**Contexto útil para leitores:** apps OAuth em modo "Testing" no Google Cloud têm autorização que **expira em 7 dias** — foi exatamente o que derrubou as credenciais deste projeto entre 30/06 e 08/07 e disparou a descoberta acima. A dica entrou no README (Solução de problemas).
+
+**Limitação conhecida (registrada):** chamadas de ferramentas disparadas em paralelo são atendidas concorrentemente; duas inserções simultâneas podem calcular a mesma posição (a corrida TOCTOU do achado 10, aceita). Em uso normal — uma chamada por vez — não há efeito.

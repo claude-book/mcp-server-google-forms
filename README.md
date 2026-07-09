@@ -46,6 +46,13 @@ docs/                  → revisão de código e histórico de alterações
 
 > Desde 30/06/2026, formulários criados via API nascem **não publicados** — por isso o passo `set_publish`.
 
+## Solução de problemas
+
+- **"Credenciais expiradas ou revogadas"** — rode `npm run token` de novo e repita o comando; o servidor
+  recarrega as credenciais sozinho, sem precisar reiniciar. Importante: enquanto o app OAuth estiver em modo
+  **Testing** no Google Cloud, o Google expira a autorização a cada **7 dias**. Para tokens duradouros,
+  publique o app (tela de permissão OAuth → **In production**).
+
 ## Documentação
 
 - [Revisão de código](docs/revisao-de-codigo.md) — problemas conhecidos, gravidade, status das correções e histórico de alterações com as razões de cada mudança.
