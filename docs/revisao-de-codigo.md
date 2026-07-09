@@ -245,3 +245,11 @@ Revisão `/code-review high` executada (este documento). À época, todos os 10 
 **Por quê:** com o app OAuth em modo **In production** (mudança feita para os tokens não expirarem a cada 7 dias), a tela de Branding do Google Cloud pede homepage, política de privacidade e termos — e o domínio dessas URLs precisa ser "autorizável" pelo dono. `github.com` não pode ser autorizado (não é nosso), mas `claude-book.github.io` pode: o `github.io` está na Public Suffix List, então cada subdomínio conta como domínio independente do dono da conta/organização.
 
 **Decisão registrada:** a **verificação da marca** ("Verify branding") **não é necessária** para o modelo do livro — cada leitor cria o próprio projeto no Google Cloud e aceita a tela de "app não verificado" uma única vez (Avançado → Acessar). O preenchimento do Branding é polimento e material didático; a verificação formal do Google (que envolve Search Console e análise) fica como opção futura.
+
+### 08/07/2026 — Verificação da marca iniciada (a pedido do autor)
+
+Revendo a decisão acima, o autor optou por concluir a verificação da marca. O que foi feito:
+
+- **App renomeado no console** de "claude-forms-mcp" para **"mcp-server-google-forms"**, casando com o nome exibido no site (uma das exigências apontadas pelo verificador do Google).
+- **Propriedade registrada no Google Search Console** (tipo "Prefixo do URL": `https://claude-book.github.io/mcp-server-google-forms/`), com verificação pelo método do arquivo HTML.
+- **`docs/google610e27547249eb1a.html`** — arquivo de verificação de propriedade do Google. ⚠️ **Nunca remover este arquivo**: a verificação de propriedade (e com ela a marca verificada do app OAuth) cai se ele sair do ar.
