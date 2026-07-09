@@ -55,6 +55,7 @@ docs/                  → revisão de código e histórico de alterações
 
 ## Documentação
 
+- [Página do projeto](https://claude-book.github.io/mcp-server-google-forms/) — apresentação, [política de privacidade](https://claude-book.github.io/mcp-server-google-forms/privacidade.html) e [termos de uso](https://claude-book.github.io/mcp-server-google-forms/termos.html).
 - [Revisão de código](docs/revisao-de-codigo.md) — problemas conhecidos, gravidade, status das correções e histórico de alterações com as razões de cada mudança.
 - [Versão em HTML](docs/revisao-de-codigo.html) — o mesmo relatório em formato amigável para não-programadores (abra no navegador).
 

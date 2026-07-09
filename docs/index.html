@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Se um dia for verificar o domínio no Google Search Console, cole aqui a meta tag google-site-verification -->
+<title>mcp-server-google-forms — Google Forms no Claude Code</title>
+<style>
+  :root {
+    --bg: #faf9fc; --surface: #ffffff; --ink: #26212e; --muted: #6b6477;
+    --accent: #6d3fc0; --line: #e6e1ee;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #17141c; --surface: #201c27; --ink: #eae6f2; --muted: #a49bb3;
+      --accent: #a583e8; --line: #332d3e;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 17px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  .wrap { max-width: 46rem; margin: 0 auto; padding: 3.5rem 1.25rem 4rem; }
+  .eyebrow {
+    text-transform: uppercase; letter-spacing: .14em; font-size: .72rem;
+    color: var(--accent); font-weight: 700; margin: 0 0 .75rem;
+  }
+  h1 { font-size: 2rem; line-height: 1.2; margin: 0 0 .75rem; text-wrap: balance; }
+  h2 { font-size: 1.15rem; margin: 2.5rem 0 .5rem; }
+  p { margin: .5rem 0 1rem; }
+  .lead { font-size: 1.15rem; color: var(--muted); max-width: 40rem; }
+  a { color: var(--accent); }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+  .links { display: flex; flex-wrap: wrap; gap: .6rem; margin: 1.75rem 0 0; padding: 0; list-style: none; }
+  .links a {
+    display: inline-block; padding: .45rem .9rem; border: 1px solid var(--line);
+    border-radius: 999px; background: var(--surface); text-decoration: none;
+    font-size: .92rem; font-weight: 600;
+  }
+  .links a.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  ol { padding-left: 1.3rem; } li { margin: .35rem 0; }
+  code {
+    font: .88em ui-monospace, "SF Mono", Menlo, monospace;
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 5px; padding: .1em .35em;
+  }
+  footer { margin-top: 3.5rem; padding-top: 1.25rem; border-top: 1px solid var(--line); font-size: .88rem; color: var(--muted); }
+  footer nav { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: .35rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">Código de exemplo do livro sobre Claude Code</p>
+  <h1>Crie e edite Google Forms conversando com o Claude</h1>
+  <p class="lead">
+    <strong>mcp-server-google-forms</strong> é um servidor MCP local, em Node.js, que dá ao
+    Claude Code ferramentas para criar formulários, adicionar perguntas, montar quizzes,
+    publicar e ler respostas — tudo pela conversa.
+  </p>
+  <ul class="links">
+    <li><a class="primary" href="https://github.com/claude-book/mcp-server-google-forms">Ver no GitHub</a></li>
+    <li><a href="revisao-de-codigo.html">Revisão de código</a></li>
+    <li><a href="privacidade.html">Política de privacidade</a></li>
+    <li><a href="termos.html">Termos de uso</a></li>
+  </ul>
+
+  <h2>Como funciona</h2>
+  <p>
+    O servidor roda <strong>no seu computador</strong> e conversa com a API oficial do Google Forms
+    usando uma autorização que só você concede. Nenhum dado passa por servidores de terceiros:
+    é a sua máquina falando diretamente com o Google.
+  </p>
+
+  <h2>Comece em quatro passos</h2>
+  <ol>
+    <li>Clone o repositório e rode <code>npm install</code>.</li>
+    <li>No Google Cloud, ative a <strong>Google Forms API</strong> e baixe credenciais OAuth do tipo “App para computador” para a pasta <code>credentials/</code>.</li>
+    <li>Rode <code>npm run token</code> e autorize no navegador.</li>
+    <li>Registre no Claude Code: <code>claude mcp add google-forms -- node "$(pwd)/src/server.js"</code></li>
+  </ol>
+  <p>O passo a passo completo, com solução de problemas, está no <a href="https://github.com/claude-book/mcp-server-google-forms#readme">README</a>.</p>
+
+  <footer>
+    <p>MIT © 2026 Henrique Alvarenga da Silva · contato: henriquealvarenga@gmail.com</p>
+    <nav>
+      <a href="privacidade.html">Privacidade</a>
+      <a href="termos.html">Termos</a>
+      <a href="https://github.com/claude-book/mcp-server-google-forms">GitHub</a>
+    </nav>
+  </footer>
+</div>
+</body>
+</html>

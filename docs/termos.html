@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Termos de Uso — mcp-server-google-forms</title>
+<style>
+  :root {
+    --bg: #faf9fc; --surface: #ffffff; --ink: #26212e; --muted: #6b6477;
+    --accent: #6d3fc0; --line: #e6e1ee;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #17141c; --surface: #201c27; --ink: #eae6f2; --muted: #a49bb3;
+      --accent: #a583e8; --line: #332d3e;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 17px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  .wrap { max-width: 44rem; margin: 0 auto; padding: 3.5rem 1.25rem 4rem; }
+  .eyebrow {
+    text-transform: uppercase; letter-spacing: .14em; font-size: .72rem;
+    color: var(--accent); font-weight: 700; margin: 0 0 .75rem;
+  }
+  h1 { font-size: 1.7rem; line-height: 1.25; margin: 0 0 .35rem; text-wrap: balance; }
+  .date { color: var(--muted); font-size: .9rem; margin: 0 0 1.5rem; }
+  h2 { font-size: 1.08rem; margin: 2rem 0 .4rem; }
+  p, li { margin: .45rem 0; }
+  ul { padding-left: 1.3rem; }
+  a { color: var(--accent); }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+  footer { margin-top: 3rem; padding-top: 1.25rem; border-top: 1px solid var(--line); font-size: .88rem; color: var(--muted); }
+  footer nav { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: .35rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">mcp-server-google-forms</p>
+  <h1>Termos de Uso</h1>
+  <p class="date">Vigentes a partir de 8 de julho de 2026</p>
+
+  <h2>1. O que é</h2>
+  <p>
+    O <strong>mcp-server-google-forms</strong> é um software gratuito e de código aberto que
+    permite ao Claude Code criar e editar Google Forms na conta Google do próprio usuário.
+    Ele roda localmente, no computador de quem o instala.
+  </p>
+
+  <h2>2. Licença</h2>
+  <p>
+    O software é distribuído sob a <a href="https://github.com/claude-book/mcp-server-google-forms/blob/main/LICENSE">licença MIT</a>:
+    você pode usar, copiar, modificar e redistribuir, mantendo o aviso de copyright.
+  </p>
+
+  <h2>3. Sem garantias</h2>
+  <p>
+    O software é fornecido “como está”, sem garantias de qualquer tipo. Os autores não se
+    responsabilizam por perdas ou danos decorrentes do uso — incluindo, por exemplo,
+    alterações ou exclusões de formulários feitas por seu intermédio.
+  </p>
+
+  <h2>4. Suas responsabilidades</h2>
+  <ul>
+    <li>O conteúdo dos formulários criados e das respostas coletadas é de sua responsabilidade.</li>
+    <li>O uso deve respeitar os <a href="https://policies.google.com/terms">Termos de Serviço do Google</a> e a legislação aplicável.</li>
+    <li>Mantenha a pasta <code style="font: .88em ui-monospace, Menlo, monospace;">credentials/</code> protegida — ela guarda o acesso à sua conta.</li>
+  </ul>
+
+  <h2>5. Privacidade</h2>
+  <p>
+    O tratamento de dados está descrito na <a href="privacidade.html">Política de Privacidade</a> —
+    em resumo: nada é coletado por nós; tudo fica entre o seu computador e o Google.
+  </p>
+
+  <h2>6. Contato</h2>
+  <p>Dúvidas? Escreva para <a href="mailto:henriquealvarenga@gmail.com">henriquealvarenga@gmail.com</a>.</p>
+
+  <footer>
+    <p>MIT © 2026 Henrique Alvarenga da Silva</p>
+    <nav>
+      <a href="index.html">Início</a>
+      <a href="privacidade.html">Privacidade</a>
+      <a href="https://github.com/claude-book/mcp-server-google-forms">GitHub</a>
+    </nav>
+  </footer>
+</div>
+</body>
+</html>

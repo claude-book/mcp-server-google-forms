@@ -237,3 +237,11 @@ Revisão `/code-review high` executada (este documento). À época, todos os 10 
 **Contexto útil para leitores:** apps OAuth em modo "Testing" no Google Cloud têm autorização que **expira em 7 dias** — foi exatamente o que derrubou as credenciais deste projeto entre 30/06 e 08/07 e disparou a descoberta acima. A dica entrou no README (Solução de problemas).
 
 **Limitação conhecida (registrada):** chamadas de ferramentas disparadas em paralelo são atendidas concorrentemente; duas inserções simultâneas podem calcular a mesma posição (a corrida TOCTOU do achado 10, aceita). Em uso normal — uma chamada por vez — não há efeito.
+
+### 08/07/2026 — Site do projeto no GitHub Pages: página inicial, privacidade e termos
+
+**O que mudou:** `docs/` ganhou `index.html` (apresentação do projeto), `privacidade.html` (política de privacidade) e `termos.html` (termos de uso), servidos pelo GitHub Pages em `https://claude-book.github.io/mcp-server-google-forms/`, direto da pasta `docs/` na branch `main` (sem GitHub Actions).
+
+**Por quê:** com o app OAuth em modo **In production** (mudança feita para os tokens não expirarem a cada 7 dias), a tela de Branding do Google Cloud pede homepage, política de privacidade e termos — e o domínio dessas URLs precisa ser "autorizável" pelo dono. `github.com` não pode ser autorizado (não é nosso), mas `claude-book.github.io` pode: o `github.io` está na Public Suffix List, então cada subdomínio conta como domínio independente do dono da conta/organização.
+
+**Decisão registrada:** a **verificação da marca** ("Verify branding") **não é necessária** para o modelo do livro — cada leitor cria o próprio projeto no Google Cloud e aceita a tela de "app não verificado" uma única vez (Avançado → Acessar). O preenchimento do Branding é polimento e material didático; a verificação formal do Google (que envolve Search Console e análise) fica como opção futura.
