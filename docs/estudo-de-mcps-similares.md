@@ -92,6 +92,7 @@ Por ordem de prioridade. A coluna Status deve ser atualizada conforme a implemen
 | 6 | **Seções e blocos de texto**: `add_section` (quebra de página) e `add_text_item` (texto explicativo) — o `get_form` e o `delete_question` já reconhecem esses itens; só não sabemos criá-los | MatthewWolff + udecode | Pendente |
 | 7 | **`auth_status`**: diagnóstico das credenciais (arquivo existe? token válido?) — "termômetro" barato para quem está penando com o setup do OAuth | KamaruSama | Pendente |
 | 8 | **`verify_answer_keys`**: conferir o gabarito de um quiz depois de criado, comparando com uma lista esperada — valioso quando quem monta o quiz é uma IA, que pode errar | KamaruSama | Pendente |
+| 9 | **Preparação para publicar no npm**: aceitar credenciais por variável de ambiente ou pasta do usuário (hoje o caminho é relativo ao projeto, o que quebra quando instalado via npm/npx), remover `"private": true`, declarar os arquivos do pacote e conferir a disponibilidade do nome. O servidor já usa o SDK oficial (`@modelcontextprotocol/sdk`) — requisito principal cumprido desde o início. Publicação em si depende da conta npm do autor. | MatthewWolff (npm + MCP Registry) | Pendente |
 
 **Ideias avaliadas e não adotadas (com razão):**
 
