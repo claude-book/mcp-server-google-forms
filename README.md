@@ -17,7 +17,8 @@ docs/                  → revisão de código e histórico de alterações
 - `create_form` — cria um formulário (nasce **não publicado**) e devolve o ID e os links.
 - `set_publish` — publica ou despublica o formulário (necessário para receber respostas).
 - `get_form` — mostra a lista de itens com as posições e a estrutura completa.
-- `add_question` — acrescenta uma pergunta (no final ou numa posição indicada).
+- `add_question` — acrescenta uma pergunta (no final ou numa posição indicada). Nove tipos: texto curto/longo,
+  escolha única, caixas de seleção, lista suspensa, escala linear, data, hora/duração e avaliação (estrelas, corações ou joinhas).
 - `set_quiz` — liga ou desliga o modo quiz (com notas). Obrigatório antes de usar `points`.
 - `delete_question` — remove a pergunta na posição indicada (recusa apagar o que não for pergunta).
 - `move_question` — move um item de uma posição para outra.

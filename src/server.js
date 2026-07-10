@@ -93,7 +93,9 @@ function describeItem(item) {
 }
 
 // Monta o objeto de pergunta conforme um "tipo" amigável, com nota opcional (quiz).
-function buildQuestion(type, required, options, points, correctAnswers) {
+// Recebe a especificação completa (mesmos nomes dos parâmetros das ferramentas).
+function buildQuestion(spec) {
+  const { type, required, options, points, correctAnswers } = spec;
   const q = { required: !!required };
   switch (type) {
     case "short_text":
@@ -112,6 +114,30 @@ function buildQuestion(type, required, options, points, correctAnswers) {
       q.choiceQuestion = { type: map[type], options: options.map((v) => ({ value: v })) };
       break;
     }
+    case "linear_scale": {
+      const low = spec.scaleMin ?? 1;
+      const high = spec.scaleMax ?? 5;
+      if (low >= high) {
+        throw new Error(`Escala inválida: scaleMin (${low}) precisa ser menor que scaleMax (${high}).`);
+      }
+      q.scaleQuestion = { low, high };
+      if (spec.scaleMinLabel) q.scaleQuestion.lowLabel = spec.scaleMinLabel;
+      if (spec.scaleMaxLabel) q.scaleQuestion.highLabel = spec.scaleMaxLabel;
+      break;
+    }
+    case "date":
+      // O ano entra por padrão (como na interface do Forms); a hora não.
+      q.dateQuestion = { includeTime: !!spec.includeTime, includeYear: spec.includeYear ?? true };
+      break;
+    case "time":
+      q.timeQuestion = { duration: !!spec.isDuration };
+      break;
+    case "rating":
+      q.ratingQuestion = {
+        ratingScaleLevel: spec.ratingLevels ?? 5,
+        iconType: (spec.ratingIcon ?? "star").toUpperCase(),
+      };
+      break;
     default:
       throw new Error(`Tipo de pergunta desconhecido: '${type}'.`);
   }
@@ -221,25 +247,52 @@ tool(
   }
 );
 
+// Campos que descrevem UMA pergunta — compartilhados por add_question (e, no
+// futuro, por outras ferramentas que criem perguntas).
+const questionFields = {
+  title: z.string().describe("Enunciado da pergunta"),
+  type: z
+    .enum([
+      "short_text",
+      "paragraph",
+      "multiple_choice",
+      "checkboxes",
+      "dropdown",
+      "linear_scale",
+      "date",
+      "time",
+      "rating",
+    ])
+    .describe("Tipo da pergunta"),
+  required: z.boolean().optional().describe("Se a resposta é obrigatória"),
+  options: z.array(z.string()).optional().describe("Alternativas (para multiple_choice/checkboxes/dropdown)"),
+  points: z.number().optional().describe("Pontos da pergunta no quiz (exige modo quiz ativo; ex.: 1)"),
+  correctAnswers: z
+    .array(z.string())
+    .optional()
+    .describe("Resposta(s) correta(s) para quiz, batendo com as 'options'"),
+  scaleMin: z.number().int().min(0).max(1).optional().describe("(linear_scale) Início da escala: 0 ou 1 (padrão 1)"),
+  scaleMax: z.number().int().min(2).max(10).optional().describe("(linear_scale) Fim da escala: 2 a 10 (padrão 5)"),
+  scaleMinLabel: z.string().optional().describe("(linear_scale) Rótulo do início, ex.: 'Discordo totalmente'"),
+  scaleMaxLabel: z.string().optional().describe("(linear_scale) Rótulo do fim, ex.: 'Concordo totalmente'"),
+  includeTime: z.boolean().optional().describe("(date) Pedir também a hora (padrão: não)"),
+  includeYear: z.boolean().optional().describe("(date) Pedir o ano (padrão: sim)"),
+  isDuration: z.boolean().optional().describe("(time) true = duração (horas e minutos); false = hora do dia (padrão)"),
+  ratingLevels: z.number().int().min(3).max(10).optional().describe("(rating) Quantidade de níveis: 3 a 10 (padrão 5)"),
+  ratingIcon: z.enum(["star", "heart", "thumb_up"]).optional().describe("(rating) Ícone da avaliação (padrão star)"),
+};
+
 tool(
   "add_question",
   {
     title: "Adicionar pergunta",
     description:
-      "Acrescenta uma pergunta a um formulário (no final, ou na posição indicada por 'index'). Para valer pontos ('points'), o formulário precisa estar em modo quiz — use set_quiz antes.",
+      "Acrescenta uma pergunta a um formulário (no final, ou na posição indicada por 'index'). " +
+      "Tipos: texto curto/longo, escolha (única, múltipla, lista), escala linear, data, hora e avaliação. " +
+      "Para valer pontos ('points'), o formulário precisa estar em modo quiz — use set_quiz antes.",
     inputSchema: {
       formId: z.string().describe("ID do formulário"),
-      title: z.string().describe("Enunciado da pergunta"),
-      type: z
-        .enum(["short_text", "paragraph", "multiple_choice", "checkboxes", "dropdown"])
-        .describe("Tipo da pergunta"),
-      required: z.boolean().optional().describe("Se a resposta é obrigatória"),
-      options: z.array(z.string()).optional().describe("Alternativas (para escolha/checkbox/dropdown)"),
-      points: z.number().optional().describe("Pontos da pergunta no quiz (exige modo quiz ativo; ex.: 1)"),
-      correctAnswers: z
-        .array(z.string())
-        .optional()
-        .describe("Resposta(s) correta(s) para quiz, batendo com as 'options'"),
+      ...questionFields,
       index: z
         .number()
         .int()
@@ -248,7 +301,8 @@ tool(
         .describe("Posição do novo item (0 = primeiro; as posições contam todos os itens). Se omitido, entra no final."),
     },
   },
-  async ({ formId, title, type, required, options, points, correctAnswers, index }) => {
+  async (args) => {
+    const { formId, title, points, index } = args;
     // O forms.get abaixo faz papel triplo: calcula a posição de inserção,
     // valida o índice pedido e checa o modo quiz antes de anexar pontuação.
     const form = await fetchForm(formId);
@@ -263,7 +317,7 @@ tool(
     if (at > items.length) {
       return fail(`Posição ${at} fora do intervalo: o formulário tem ${items.length} item(ns), então use 0 a ${items.length}.`);
     }
-    const question = buildQuestion(type, required, options, points, correctAnswers);
+    const question = buildQuestion(args);
     await batchUpdate(formId, [
       { createItem: { item: { title, questionItem: { question } }, location: { index: at } } },
     ]);
