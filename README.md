@@ -25,6 +25,8 @@ docs/                  → revisão de código e histórico de alterações
 - `update_question` — edita uma pergunta existente (enunciado, obrigatoriedade, alternativas, pontos, gabarito)
   sem apagar e recriar — preserva o vínculo com respostas já recebidas.
 - `set_quiz` — liga ou desliga o modo quiz (com notas). Obrigatório antes de usar `points`.
+- `add_section` — insere uma quebra de seção (nova página) na posição indicada.
+- `add_text_item` — insere um bloco de texto explicativo (sem campo de resposta) na posição indicada.
 - `delete_question` — remove a pergunta na posição indicada (recusa apagar o que não for pergunta).
 - `move_question` — move um item de uma posição para outra.
 - `list_responses` — lista as respostas, incluindo perguntas de upload de arquivo. Em páginas (padrão 50),

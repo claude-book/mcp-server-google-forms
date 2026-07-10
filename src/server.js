@@ -588,6 +588,71 @@ tool(
   }
 );
 
+// Insere um item sem pergunta (seção ou bloco de texto) com a mesma validação
+// de posição do add_question. Retorna a posição usada ou uma mensagem de erro.
+async function insertStaticItem(formId, item, index) {
+  const form = await fetchForm(formId);
+  const items = form.items || [];
+  const at = index ?? items.length;
+  if (at > items.length) {
+    return { error: `Posição ${at} fora do intervalo: o formulário tem ${items.length} item(ns), então use 0 a ${items.length}.` };
+  }
+  await batchUpdate(formId, [{ createItem: { item, location: { index: at } } }]);
+  return { at };
+}
+
+tool(
+  "add_section",
+  {
+    title: "Adicionar seção",
+    description:
+      "Insere uma quebra de seção (nova página) no formulário: quem responde avança de seção com o botão 'Próxima'. " +
+      "As posições contam todos os itens — confira com get_form.",
+    inputSchema: {
+      formId: z.string().describe("ID do formulário"),
+      title: z.string().describe("Título da seção"),
+      description: z.string().optional().describe("Texto exibido abaixo do título da seção (opcional)"),
+      index: z
+        .number()
+        .int()
+        .min(0)
+        .optional()
+        .describe("Posição do novo item (0 = primeiro; contam todos os itens). Se omitido, entra no final."),
+    },
+  },
+  async ({ formId, title, description, index }) => {
+    const r = await insertStaticItem(formId, { title, description, pageBreakItem: {} }, index);
+    if (r.error) return fail(r.error);
+    return text(`Seção "${title}" adicionada na posição ${r.at} (contando todos os itens do formulário).`);
+  }
+);
+
+tool(
+  "add_text_item",
+  {
+    title: "Adicionar bloco de texto",
+    description:
+      "Insere um bloco de texto estático (título + texto explicativo) entre as perguntas — sem campo de resposta. " +
+      "As posições contam todos os itens — confira com get_form.",
+    inputSchema: {
+      formId: z.string().describe("ID do formulário"),
+      title: z.string().describe("Título do bloco"),
+      description: z.string().optional().describe("Texto do bloco (opcional)"),
+      index: z
+        .number()
+        .int()
+        .min(0)
+        .optional()
+        .describe("Posição do novo item (0 = primeiro; contam todos os itens). Se omitido, entra no final."),
+    },
+  },
+  async ({ formId, title, description, index }) => {
+    const r = await insertStaticItem(formId, { title, description, textItem: {} }, index);
+    if (r.error) return fail(r.error);
+    return text(`Bloco de texto "${title}" adicionado na posição ${r.at} (contando todos os itens do formulário).`);
+  }
+);
+
 tool(
   "set_quiz",
   {
