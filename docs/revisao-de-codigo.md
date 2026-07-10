@@ -308,3 +308,14 @@ Revendo a decisão acima, o autor optou por concluir a verificação da marca. O
 **Verificação:** simulação completa da instalação npm — `npm pack`, tarball extraído fora do projeto, dependências instaladas, e o servidor rodando do pacote extraído respondeu ao `auth_status` com sucesso usando `GOOGLE_FORMS_MCP_DIR` (teste real de refresh aceito pelo Google); sem a variável e sem a pasta do projeto, a resolução caiu corretamente em `~/.config/mcp-server-google-forms`; regressão do caso clone OK (`credentials/` do projeto).
 
 **Publicação concluída (10/07/2026, mais tarde):** o autor publicou o pacote interativamente com 2FA pelo navegador — primeiro pacote npm dele. Verificação pós-publicação: `npm view` confirmou a v0.4.1 no registro público, e uma instalação real a partir do registro (`npm install mcp-server-google-forms`, fora do projeto) rodou o servidor com sucesso — `auth_status` respondeu com o refresh aceito pelo Google via `GOOGLE_FORMS_MCP_DIR`. Ajuste decorrente: `npm pkg fix` aplicado ao `package.json` (o npm exige o prefixo `git+` na URL do repositório — ele corrigia sozinho a cada publish, com aviso; agora está no formato canônico). Próximo passo opcional registrado: entrar no MCP Registry oficial da Anthropic.
+
+### 10/07/2026 — MCP Registry oficial, release v0.4.2 e DOI no Zenodo
+
+**O que aconteceu (na sequência):**
+
+- **v0.4.2 no npm** com o campo `mcpName` — é assim que o MCP Registry comprova que o pacote npm pertence a quem registra (ele baixa o pacote publicado e confere o campo).
+- **Registro no MCP Registry oficial** como `io.github.claude-book/mcp-server-google-forms`, via `mcp-publisher` com autenticação GitHub (fluxo de código de dispositivo). Dois obstáculos reais, registrados para o livro: a **descrição tem limite de 100 caracteres** (a nossa tinha 180 e foi recusada com erro 422) e o namespace da organização **exige participação pública** do autor na organização do GitHub (erro 403 até tornar a participação `claude-book` pública e refazer o login).
+- **Release v0.4.2 no GitHub** (tag `v0.4.2`), com a conexão GitHub→Zenodo previamente ligada pelo autor — que precisou também liberar o acesso do app Zenodo na organização (Settings da organização → Third-party Access → OAuth app policy).
+- **DOI emitido pelo Zenodo** minutos depois, com metadados lidos do `CITATION.cff`: versão v0.4.2 = `10.5281/zenodo.21296976`; **conceito (sempre a última versão) = `10.5281/zenodo.21296975`** — este é o recomendado para citação no livro. Selos de npm, MCP Registry e DOI adicionados ao README, com seção de citação.
+
+**Verificação:** busca pública no registro (`GET /v0/servers?search=google-forms`) retornou o servidor na versão 0.4.2; a API do Zenodo confirmou título, autoria e licença corretos no depósito; release único e tag única conferidos via `gh release list`.

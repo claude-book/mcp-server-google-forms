@@ -1,7 +1,11 @@
 # mcp-server-google-forms
 
+[![npm](https://img.shields.io/npm/v/mcp-server-google-forms?label=npm&color=cb3837)](https://www.npmjs.com/package/mcp-server-google-forms)
+[![MCP Registry](https://img.shields.io/badge/MCP%20Registry-io.github.claude--book-6d3fc0)](https://registry.modelcontextprotocol.io/v0/servers?search=io.github.claude-book/mcp-server-google-forms)
+[![DOI](https://zenodo.org/badge/1294358395.svg)](https://doi.org/10.5281/zenodo.21296975)
+
 Servidor MCP local que permite ao Claude Code **criar, editar e publicar Google Forms**.
-Código de exemplo do livro sobre Claude Code — clone, autorize com a sua conta Google e use.
+Código de exemplo do livro sobre Claude Code — instale pelo npm (ou clone), autorize com a sua conta Google e use.
 
 ## Estrutura da pasta
 
@@ -94,6 +98,12 @@ O servidor e o script de autorização procuram as credenciais nesta ordem:
 Tudo na pasta de credenciais guarda segredos — no caso do clone, a pasta `credentials/` inteira está no
 `.gitignore` e nunca deve ser commitada. O pacote npm é gerado só com `src/` e `scripts/` (campo `files`
 do `package.json`), então credenciais jamais entram no pacote.
+
+## Citação
+
+Este software tem DOI permanente (arquivado no [Zenodo](https://doi.org/10.5281/zenodo.21296975) a cada release; metadados em [CITATION.cff](CITATION.cff)):
+
+> Alvarenga da Silva, H. (2026). *mcp-server-google-forms: servidor MCP para Google Forms*. Zenodo. https://doi.org/10.5281/zenodo.21296975
 
 ## Licença
 
