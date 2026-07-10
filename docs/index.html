@@ -28,22 +28,30 @@
   }
   h1 { font-size: 2rem; line-height: 1.2; margin: 0 0 .75rem; text-wrap: balance; }
   h2 { font-size: 1.15rem; margin: 2.5rem 0 .5rem; }
+  h3 { font-size: 1rem; margin: 1.5rem 0 .35rem; }
   p { margin: .5rem 0 1rem; }
   .lead { font-size: 1.15rem; color: var(--muted); max-width: 40rem; }
   a { color: var(--accent); }
   a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
-  .links { display: flex; flex-wrap: wrap; gap: .6rem; margin: 1.75rem 0 0; padding: 0; list-style: none; }
+  .badges { display: flex; flex-wrap: wrap; gap: .5rem; margin: 1.25rem 0 0; }
+  .badges img { height: 22px; }
+  .links { display: flex; flex-wrap: wrap; gap: .6rem; margin: 1.25rem 0 0; padding: 0; list-style: none; }
   .links a {
     display: inline-block; padding: .45rem .9rem; border: 1px solid var(--line);
     border-radius: 999px; background: var(--surface); text-decoration: none;
     font-size: .92rem; font-weight: 600;
   }
   .links a.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
-  ol { padding-left: 1.3rem; } li { margin: .35rem 0; }
+  ol, ul { padding-left: 1.3rem; } li { margin: .35rem 0; }
   code {
     font: .88em ui-monospace, "SF Mono", Menlo, monospace;
     background: var(--surface); border: 1px solid var(--line);
     border-radius: 5px; padding: .1em .35em;
+    overflow-wrap: anywhere;
+  }
+  .cite {
+    background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--accent);
+    border-radius: 8px; padding: .9rem 1.1rem; font-size: .95rem;
   }
   footer { margin-top: 3.5rem; padding-top: 1.25rem; border-top: 1px solid var(--line); font-size: .88rem; color: var(--muted); }
   footer nav { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: .35rem; }
@@ -54,32 +62,79 @@
   <p class="eyebrow">Código de exemplo do livro sobre Claude Code</p>
   <h1>Crie e edite Google Forms conversando com o Claude</h1>
   <p class="lead">
-    <strong>mcp-server-google-forms</strong> é um servidor MCP local, em Node.js, que dá ao
-    Claude Code ferramentas para criar formulários, adicionar perguntas, montar quizzes,
-    publicar e ler respostas — tudo pela conversa.
+    <strong>mcp-server-google-forms</strong> é um servidor MCP local, em Node.js, com
+    <strong>15 ferramentas</strong> para o Claude criar formulários completos numa única operação,
+    montar quizzes com gabarito, organizar seções, publicar e ler respostas — tudo pela conversa.
+  </p>
+  <p class="badges">
+    <a href="https://www.npmjs.com/package/mcp-server-google-forms"><img src="https://img.shields.io/npm/v/mcp-server-google-forms?label=npm&color=cb3837" alt="Versão publicada no npm"></a>
+    <a href="https://registry.modelcontextprotocol.io/v0/servers?search=io.github.claude-book/mcp-server-google-forms"><img src="https://img.shields.io/badge/MCP%20Registry-io.github.claude--book-6d3fc0" alt="Registrado no MCP Registry oficial"></a>
+    <a href="https://doi.org/10.5281/zenodo.21296975"><img src="https://zenodo.org/badge/1294358395.svg" alt="DOI no Zenodo"></a>
   </p>
   <ul class="links">
     <li><a class="primary" href="https://github.com/claude-book/mcp-server-google-forms">Ver no GitHub</a></li>
+    <li><a href="https://www.npmjs.com/package/mcp-server-google-forms">Pacote no npm</a></li>
     <li><a href="revisao-de-codigo.html">Revisão de código</a></li>
     <li><a href="privacidade.html">Política de privacidade</a></li>
     <li><a href="termos.html">Termos de uso</a></li>
   </ul>
 
+  <h2>Onde ele está publicado</h2>
+  <ul>
+    <li><strong>npm</strong> — instale com um comando, sem clonar nada: <a href="https://www.npmjs.com/package/mcp-server-google-forms">mcp-server-google-forms</a>.</li>
+    <li><strong>MCP Registry oficial</strong> (da Anthropic e da comunidade MCP) — registrado como <code>io.github.claude-book/mcp-server-google-forms</code>.</li>
+    <li><strong>Zenodo (CERN)</strong> — cada versão é arquivada com DOI permanente; citável em trabalhos acadêmicos.</li>
+  </ul>
+
   <h2>Como funciona</h2>
   <p>
     O servidor roda <strong>no seu computador</strong> e conversa com a API oficial do Google Forms
-    usando uma autorização que só você concede. Nenhum dado passa por servidores de terceiros:
-    é a sua máquina falando diretamente com o Google.
+    usando uma autorização que só você concede — com os <strong>escopos mínimos</strong> (formulários e
+    leitura de respostas; nada de acesso ao Drive inteiro). Nenhum dado passa por servidores de
+    terceiros: é a sua máquina falando diretamente com o Google.
   </p>
 
-  <h2>Comece em quatro passos</h2>
+  <h2>O que ele faz (15 ferramentas)</h2>
+  <ul>
+    <li><strong>Criar</strong> — <code>build_form</code> monta o formulário inteiro numa única operação (título, descrição, quiz e até 50 perguntas); <code>create_form</code> cria um vazio.</li>
+    <li><strong>Perguntar</strong> — <code>add_question</code> com 9 tipos: texto curto e longo, escolha única, caixas de seleção, lista suspensa, escala linear, data, hora/duração e avaliação (estrelas, corações, joinhas).</li>
+    <li><strong>Organizar</strong> — seções (<code>add_section</code>), blocos de texto (<code>add_text_item</code>), mover (<code>move_question</code>) e apagar (<code>delete_question</code>) com validação de posição.</li>
+    <li><strong>Editar sem recriar</strong> — <code>update_question</code> e <code>update_form_info</code> preservam o vínculo com respostas já recebidas.</li>
+    <li><strong>Quiz de verdade</strong> — pontos e gabarito por pergunta (<code>set_quiz</code>), com auditoria pós-criação (<code>verify_answer_keys</code>).</li>
+    <li><strong>Publicar e acompanhar</strong> — <code>set_publish</code>, <code>get_form</code> (resumo legível) e <code>list_responses</code> (paginada).</li>
+    <li><strong>Diagnóstico</strong> — <code>auth_status</code> testa as credenciais direto com o Google.</li>
+  </ul>
+  <p>E quando algo dá errado, as mensagens explicam <em>o que fazer</em>, em português — nada de erro técnico cru.</p>
+
+  <h2>Manual: comece a usar</h2>
+
+  <h3>Antes de tudo (uma vez): o projeto no Google Cloud</h3>
   <ol>
-    <li>Clone o repositório e rode <code>npm install</code>.</li>
-    <li>No Google Cloud, ative a <strong>Google Forms API</strong> e baixe credenciais OAuth do tipo “App para computador” para a pasta <code>credentials/</code>.</li>
+    <li>Em <a href="https://console.cloud.google.com">console.cloud.google.com</a>, crie um projeto e ative a <strong>Google Forms API</strong>.</li>
+    <li>Crie credenciais OAuth do tipo <strong>“App para computador”</strong> e baixe o arquivo <code>client_secret*.json</code>.</li>
+  </ol>
+
+  <h3>Caminho A — via npm (recomendado)</h3>
+  <ol>
+    <li>Coloque o <code>client_secret*.json</code> na pasta <code>~/.config/mcp-server-google-forms/</code> (crie-a se não existir).</li>
+    <li>Autorize com o Google: <code>npx -p mcp-server-google-forms mcp-server-google-forms-token</code></li>
+    <li>Registre no Claude Code: <code>claude mcp add google-forms -- npx mcp-server-google-forms</code></li>
+  </ol>
+
+  <h3>Caminho B — via clone do repositório</h3>
+  <ol>
+    <li>Clone o <a href="https://github.com/claude-book/mcp-server-google-forms">repositório</a> e rode <code>npm install</code>.</li>
+    <li>Coloque o <code>client_secret*.json</code> na pasta <code>credentials/</code>.</li>
     <li>Rode <code>npm run token</code> e autorize no navegador.</li>
     <li>Registre no Claude Code: <code>claude mcp add google-forms -- node "$(pwd)/src/server.js"</code></li>
   </ol>
-  <p>O passo a passo completo, com solução de problemas, está no <a href="https://github.com/claude-book/mcp-server-google-forms#readme">README</a>.</p>
+  <p>Pronto: peça ao Claude, por exemplo, <em>“crie um quiz de 5 perguntas sobre fotossíntese, valendo 2 pontos cada, e me dê o link”</em>. O passo a passo completo, com solução de problemas, está no <a href="https://github.com/claude-book/mcp-server-google-forms#readme">README</a>.</p>
+
+  <h2>Para citar em trabalhos acadêmicos</h2>
+  <p class="cite">
+    Alvarenga da Silva, H. (2026). <em>mcp-server-google-forms: servidor MCP para Google Forms</em>.
+    Zenodo. <a href="https://doi.org/10.5281/zenodo.21296975">https://doi.org/10.5281/zenodo.21296975</a>
+  </p>
 
   <footer>
     <p>MIT © 2026 Henrique Alvarenga da Silva · contato: henriquealvarenga@gmail.com</p>
@@ -87,6 +142,8 @@
       <a href="privacidade.html">Privacidade</a>
       <a href="termos.html">Termos</a>
       <a href="https://github.com/claude-book/mcp-server-google-forms">GitHub</a>
+      <a href="https://www.npmjs.com/package/mcp-server-google-forms">npm</a>
+      <a href="https://doi.org/10.5281/zenodo.21296975">DOI</a>
     </nav>
   </footer>
 </div>
