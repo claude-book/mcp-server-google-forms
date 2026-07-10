@@ -563,15 +563,27 @@ tool(
   "list_responses",
   {
     title: "Ler respostas",
-    description: "Lista as respostas de um formulário, já com o enunciado de cada pergunta no lugar do código interno.",
-    inputSchema: { formId: z.string().describe("ID do formulário") },
+    description:
+      "Lista as respostas de um formulário, já com o enunciado de cada pergunta no lugar do código interno. " +
+      "Vem em páginas (padrão: 50 por vez); se houver mais, a saída traz o pageToken da página seguinte.",
+    inputSchema: {
+      formId: z.string().describe("ID do formulário"),
+      pageSize: z
+        .number()
+        .int()
+        .min(1)
+        .max(5000)
+        .optional()
+        .describe("Quantas respostas trazer por página (padrão 50)"),
+      pageToken: z.string().optional().describe("Token da página seguinte, devolvido pela chamada anterior"),
+    },
   },
-  async ({ formId }) => {
+  async ({ formId, pageSize, pageToken }) => {
     const forms = getFormsClient();
     // As duas buscas são independentes; rodam em paralelo.
     const [formRes, listRes] = await Promise.all([
       forms.forms.get({ formId }),
-      forms.forms.responses.list({ formId }),
+      forms.forms.responses.list({ formId, pageSize: pageSize ?? 50, ...(pageToken ? { pageToken } : {}) }),
     ]);
     // Mapa questionId -> enunciado, para deixar a saída legível.
     const titleById = {};
@@ -581,7 +593,11 @@ tool(
     }
     const responses = listRes.data.responses || [];
     if (responses.length === 0) {
-      return text("Nenhuma resposta ainda. (O formulário está publicado? Veja set_publish.)");
+      return text(
+        pageToken
+          ? "Não há mais respostas nesta página."
+          : "Nenhuma resposta ainda. (O formulário está publicado? Veja set_publish.)"
+      );
     }
     const blocks = responses.map((r, i) => {
       const lines = [`Resposta ${i + 1} (${r.lastSubmittedTime || "?"}):`];
@@ -592,7 +608,11 @@ tool(
       if (typeof r.totalScore === "number") lines.push(`  Nota: ${r.totalScore}`);
       return lines.join("\n");
     });
-    return text(`${responses.length} resposta(s):\n\n` + blocks.join("\n\n"));
+    let out = `${responses.length} resposta(s) nesta página:\n\n` + blocks.join("\n\n");
+    if (listRes.data.nextPageToken) {
+      out += `\n\nHá mais respostas — chame list_responses de novo com pageToken: "${listRes.data.nextPageToken}".`;
+    }
+    return text(out);
   }
 );
 

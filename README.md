@@ -24,7 +24,8 @@ docs/                  → revisão de código e histórico de alterações
 - `set_quiz` — liga ou desliga o modo quiz (com notas). Obrigatório antes de usar `points`.
 - `delete_question` — remove a pergunta na posição indicada (recusa apagar o que não for pergunta).
 - `move_question` — move um item de uma posição para outra.
-- `list_responses` — lista as respostas, incluindo perguntas de upload de arquivo.
+- `list_responses` — lista as respostas, incluindo perguntas de upload de arquivo. Em páginas (padrão 50),
+  com `pageSize`/`pageToken` para formulários com muitas respostas.
 
 ## Como usar (uma vez)
 
