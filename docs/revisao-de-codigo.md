@@ -319,3 +319,19 @@ Revendo a decisão acima, o autor optou por concluir a verificação da marca. O
 - **DOI emitido pelo Zenodo** minutos depois, com metadados lidos do `CITATION.cff`: versão v0.4.2 = `10.5281/zenodo.21296976`; **conceito (sempre a última versão) = `10.5281/zenodo.21296975`** — este é o recomendado para citação no livro. Selos de npm, MCP Registry e DOI adicionados ao README, com seção de citação.
 
 **Verificação:** busca pública no registro (`GET /v0/servers?search=google-forms`) retornou o servidor na versão 0.4.2; a API do Zenodo confirmou título, autoria e licença corretos no depósito; release único e tag única conferidos via `gh release list`.
+
+### 10/07/2026 — Dieta de dependências: googleapis → @googleapis/forms (v0.5.0)
+
+**Origem:** análise do relatório do Socket.dev (scanner de segurança de pacotes) sobre a v0.4.2 publicada. Quatro agentes rastrearam **cada alerta até a origem** na árvore de dependências, e as contagens bateram exatamente com as do Socket — nada malicioso encontrado:
+
+- **Deprecated (2):** `glob@10.5.0` (via googleapis → gaxios → rimraf) e `node-domexception` (via node-fetch) — caronas transitivas; correção depende do time do Google.
+- **Uses eval (6):** técnicas internas legítimas (ajv compila validadores, polyfills, bundle de navegador do qs, arquivo de teste do object-inspect) — nenhum executa código externo; chegam via SDK do MCP e Express, não via Google.
+- **Shell access (5):** propósitos declarados (google-auth-library consulta o gcloud; SDK do MCP inicia subprocessos como *cliente*, caminho que nosso servidor não usa; arquivos de teste do gaxios). No nosso código: só o `exec` do get-token.js para abrir o navegador.
+- **Obfuscated (3 em 2):** builds minificados de navegador do `web-streams-polyfill` e do `qs` — legítimos e nem carregados pelo Node.
+- **O número-chave:** o pacote `googleapis` instala **328 APIs (202 MB)**; usamos **1** (Forms, 104 KB — 0,05%).
+
+**A mudança:** troca do guarda-chuva `googleapis` pelo par oficial `@googleapis/forms` + `google-auth-library`. `node_modules` caiu de **245 MB para 43 MB (−82%)**; o cliente Google, de 202 MB para ~1 MB (**184× menor**); `npx` fica muito mais rápido no primeiro uso. Expectativa honesta, registrada de antemão: **os alertas do Socket quase não mudam**, porque vêm dos ajudantes compartilhados (gaxios, node-fetch, SDK MCP, Express) que permanecem — o ganho real é tamanho, velocidade e menos código não usado na máquina do leitor.
+
+**Verificação (dupla):**
+1. *Bateria de ponta a ponta contra a API real* com a árvore enxuta: auth_status (fluxo descartável), build_form em modo quiz com `unpublished=true` (create + batchUpdate), add_question, update_question, add_section, move_question, delete_question, set_publish, list_responses e verify_answer_keys — todos os 4 métodos da API e os 2 fluxos OAuth exercitados, tudo ✔.
+2. *Revisão adversarial multi-agente do diff*: 2 achados confirmados e corrigidos antes do commit (este registro que faltava; frase do estudo comparativo desatualizada) e confirmações técnicas valiosas: o parâmetro `unpublished` não consta nos tipos do @googleapis/forms mas **é repassado como query string em runtime** (comprovado no teste real); o formato de erro (GaxiosError, `e.response.status`/`e.response.data`) é idêntico, mantendo válido nosso tradutor de erros; `OAuth2Client` é a mesma classe que o googleapis reexportava. O construtor posicional do OAuth2Client (marcado como antiquado) foi trocado pela forma moderna com objeto de opções nos 3 pontos de uso.

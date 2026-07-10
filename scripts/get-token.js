@@ -11,7 +11,7 @@ import http from "node:http";
 import path from "node:path";
 import crypto from "node:crypto";
 import { exec } from "node:child_process";
-import { google } from "googleapis";
+import { OAuth2Client } from "google-auth-library";
 import { credentialsDir } from "../src/credentials-dir.js";
 
 const CRED_DIR = credentialsDir();
@@ -105,7 +105,7 @@ httpServer.on("error", (e) => {
 // então nada precisa ser configurado no Google Cloud.
 httpServer.listen(0, () => {
   const redirect = `http://localhost:${httpServer.address().port}`;
-  oauth2 = new google.auth.OAuth2(creds.client_id, creds.client_secret, redirect);
+  oauth2 = new OAuth2Client({ clientId: creds.client_id, clientSecret: creds.client_secret, redirectUri: redirect });
   const authUrl = oauth2.generateAuthUrl({
     access_type: "offline",
     prompt: "consent",

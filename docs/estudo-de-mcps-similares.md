@@ -22,7 +22,7 @@
 
 ### MatthewWolff/google-forms-mcp — a referência de engenharia
 
-O único projeto com padrão profissional: 27 ferramentas em 6 categorias, **9 tipos de pergunta** (inclui escala linear, data, hora e avaliação por estrelas), paginação de respostas, exportação CSV, listagem/exclusão de formulários via Drive, notificações Pub/Sub e ferramentas de análise estatística embutidas. Tem 33 testes de integração contra a API real, CI no GitHub Actions, publicação no npm com *provenance* e annotations MCP (`readOnlyHint`, `destructiveHint`) nas ferramentas. Mesma stack que a nossa (Node + SDK MCP + googleapis + zod).
+O único projeto com padrão profissional: 27 ferramentas em 6 categorias, **9 tipos de pergunta** (inclui escala linear, data, hora e avaliação por estrelas), paginação de respostas, exportação CSV, listagem/exclusão de formulários via Drive, notificações Pub/Sub e ferramentas de análise estatística embutidas. Tem 33 testes de integração contra a API real, CI no GitHub Actions, publicação no npm com *provenance* e annotations MCP (`readOnlyHint`, `destructiveHint`) nas ferramentas. Stack quase idêntica à nossa (Node + SDK MCP + zod; ele usa o pacote guarda-chuva `googleapis` completo — nós usávamos também, até migrar para o `@googleapis/forms` enxuto na v0.5.0).
 
 Destaques que inspiraram melhorias: `build_form` (formulário inteiro em uma chamada), `get_form_summary` (resumo legível em vez do JSON gigante) e o padrão de erro das ferramentas de análise — ao errar o nome de uma pergunta, devolvem a lista de perguntas disponíveis para o modelo se autocorrigir.
 

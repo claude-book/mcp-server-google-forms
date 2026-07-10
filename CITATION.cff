@@ -15,7 +15,7 @@ keywords:
   - google-forms
   - claude
   - claude-code
-version: 0.4.2
+version: 0.5.0
 date-released: 2026-07-10
 abstract: >-
   Servidor MCP local que permite a assistentes de IA (como o Claude) criar,

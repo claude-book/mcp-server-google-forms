@@ -10,7 +10,11 @@
 // Comparação com outros MCPs e origem das melhorias: docs/estudo-de-mcps-similares.md
 
 import fs from "node:fs";
-import { google } from "googleapis";
+// Cliente oficial do Google só do Forms (~1 MB) em vez do pacote guarda-chuva
+// googleapis (~202 MB com 328 APIs que não usamos) — decisão registrada em
+// docs/revisao-de-codigo.md (análise do relatório do Socket.dev, 10/07/2026).
+import { forms as formsApi } from "@googleapis/forms";
+import { OAuth2Client } from "google-auth-library";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
@@ -39,9 +43,9 @@ function getFormsClient() {
   if (!cfg.refreshToken) {
     throw new Error(`Falta o refreshToken em ${CONFIG_PATH}. ${TOKEN_HELP}`);
   }
-  const oauth2 = new google.auth.OAuth2(cfg.clientId, cfg.clientSecret);
+  const oauth2 = new OAuth2Client({ clientId: cfg.clientId, clientSecret: cfg.clientSecret });
   oauth2.setCredentials({ refresh_token: cfg.refreshToken });
-  formsClient = google.forms({ version: "v1", auth: oauth2 });
+  formsClient = formsApi({ version: "v1", auth: oauth2 });
   return formsClient;
 }
 
@@ -899,7 +903,7 @@ tool(
     try {
       // Cliente descartável, separado do memoizado: aqui o objetivo é testar
       // o config do disco como ele está, sem interferir no cache do servidor.
-      const oauth2 = new google.auth.OAuth2(cfg.clientId, cfg.clientSecret);
+      const oauth2 = new OAuth2Client({ clientId: cfg.clientId, clientSecret: cfg.clientSecret });
       oauth2.setCredentials({ refresh_token: cfg.refreshToken });
       const { token } = await oauth2.getAccessToken();
       lines.push(
