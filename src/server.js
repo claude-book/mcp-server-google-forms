@@ -1,9 +1,13 @@
 #!/usr/bin/env node
-// Servidor MCP local para Google Forms.
-// Ferramentas: criar e publicar formulário, ver formulário, adicionar pergunta,
-// transformar em quiz, apagar pergunta, reordenar pergunta e ler respostas.
+// Servidor MCP local para Google Forms — 15 ferramentas.
+// Criação: create_form, build_form (formulário completo de uma vez).
+// Estrutura: get_form, add_question (9 tipos), update_question, delete_question,
+//   move_question, add_section, add_text_item, update_form_info.
+// Publicação e quiz: set_publish, set_quiz, verify_answer_keys.
+// Respostas e diagnóstico: list_responses (paginado), auth_status.
 // As credenciais ficam em credentials/config.json (gerado por scripts/get-token.js).
 // Problemas conhecidos e decisões de projeto: docs/revisao-de-codigo.md
+// Comparação com outros MCPs e origem das melhorias: docs/estudo-de-mcps-similares.md
 
 import fs from "node:fs";
 import { google } from "googleapis";

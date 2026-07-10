@@ -162,7 +162,7 @@ Verificados e reais, mas de baixa prioridade:
 5. ⚖️ *Decisão: não adotado.* A biblioteca oficial `@google-cloud/local-auth` substituiria o fluxo manual, mas **não permite `prompt: "consent"`** — re-autorizações poderiam vir sem refresh_token, exatamente o achado 03. Mantivemos o fluxo próprio, corrigido (state, porta efêmera, guarda de refresh token).
 6. ✅ *Corrigido (08/07/2026).* README reescrito com instruções genéricas de clone e registro.
 7. *Mantido como melhoria futura.* Adicionar um novo tipo de pergunta exige alterar 3 lugares em sincronia (o `z.enum`, o `switch` e o mapa RADIO/CHECKBOX/DROP_DOWN).
-8. *Mantido como melhoria futura.* Não há como *editar* uma pergunta existente: corrigir pontuação exige apagar e recriar, perdendo o vínculo (questionId) com respostas já recebidas.
+8. ✅ *Corrigido (10/07/2026).* Não havia como *editar* uma pergunta existente — resolvido pelas novas ferramentas `update_question` e `update_form_info` (ver histórico).
 9. *Mantido (decisão de design).* `config.json` duplica `clientId`/`clientSecret` do `client_secret*.json` — preferimos o config autocontido; rotação de segredo exige rodar `npm run token` de novo.
 
 ## Suspeitas descartadas na verificação
@@ -176,7 +176,7 @@ Registradas para que ninguém "conserte" o que não está quebrado:
 
 **Concluídos em 08/07/2026** (detalhes no histórico abaixo): os 3 graves, os 5 moderados, os 2 leves (um deles aceito com justificativa) e a preparação para publicação — README genérico, licença MIT, pacote renomeado para `mcp-server-google-forms`.
 
-Ficam como melhorias futuras opcionais: registro único de tipos de pergunta (item menor 7), ferramenta de edição de pergunta existente (item 8) e paginação em `list_responses` para formulários com muitas respostas.
+~~Ficam como melhorias futuras opcionais: registro único de tipos de pergunta (item menor 7), ferramenta de edição de pergunta existente (item 8) e paginação em `list_responses` para formulários com muitas respostas.~~ *Atualização de 10/07/2026:* edição de pergunta e paginação foram implementadas na rodada de melhorias do [estudo de MCPs similares](estudo-de-mcps-similares.md) (ver histórico); o registro único de tipos (item menor 7) segue como melhoria futura.
 
 ## Histórico de alterações e suas razões
 
@@ -270,3 +270,22 @@ Revendo a decisão acima, o autor optou por concluir a verificação da marca. O
 - **Efeito prático para usuários: nenhum.** O autor segue com token durável (modo produção); cada leitor, no próprio projeto, verá o aviso de app não verificado uma única vez e passará por ele (Avançado → Acessar) — como o livro explicará.
 
 **Lição registrada para o livro:** a jornada inteira (portaria do domínio github.io, Search Console, meta tags, e o formulário que revela a política) é um retrato fiel de como a verificação OAuth do Google funciona na prática — e de quando *não* vale a pena persegui-la.
+
+### 10/07/2026 — Rodada de melhorias do estudo de MCPs similares (v0.4.0)
+
+**Origem:** o [estudo comparativo de 7 servidores MCP para Google Forms](estudo-de-mcps-similares.md) recomendou 9 melhorias; as 8 primeiras foram implementadas nesta rodada, **cada uma em um commit isolado** (decisão do autor, para facilitar a análise de eventuais bugs). O servidor passou de 8 para **15 ferramentas**.
+
+**O que mudou (na ordem dos commits):**
+
+1. **4 tipos novos de pergunta** em `add_question`: escala linear (com rótulos), data (com/sem hora e ano), hora/duração e avaliação (estrelas, corações ou joinhas) — de 5 para 9 tipos.
+2. **`build_form`**: cria o formulário inteiro (título, descrição, quiz e até 50 perguntas) num único `batchUpdate` — antes, um formulário de N perguntas custava 1+N chamadas de ferramenta. Valida tudo *antes* de criar, para não deixar formulário órfão.
+3. **`get_form` resumido**: saída legível (dados gerais + uma linha detalhada por item, com opções, rótulos, pontos e gabarito); o JSON completo só com `raw=true`. No teste, a saída caiu de ~3.000 para ~800 caracteres.
+4. **Correção de premissa (bug descoberto no teste do item 3):** a API cria formulários **já publicados** por padrão — o contrário do que as mensagens afirmavam. `create_form`/`build_form` ganharam o parâmetro `unpublished` e passaram a informar o **estado real** devolvido pela API, robusto a futuras mudanças do Google.
+5. **Paginação em `list_responses`** (`pageSize`/`pageToken`, padrão 50) — fecha a melhoria futura registrada na revisão.
+6. **`update_form_info` e `update_question`** — editar título/descrição do formulário e enunciado/obrigatoriedade/alternativas/pontos/gabarito de uma pergunta sem apagar e recriar (fecha o item menor 8). Mudar só os pontos preserva o gabarito, e vice-versa.
+7. **`add_section` e `add_text_item`** — quebras de seção e blocos de texto, com a mesma validação de posição das demais ferramentas.
+8. **`auth_status` e `verify_answer_keys`** — diagnóstico das credenciais (com teste real de refresh junto ao Google) e auditoria de gabarito de quiz contra uma lista esperada.
+
+**Verificação:** cada commit foi testado **contra a API real do Google** antes de entrar, via cliente MCP de teste falando stdio com o servidor de verdade — incluindo 3 respostas reais enviadas pelo endpoint público para provar a paginação, e a conferência das estruturas gravadas (`forms.get`) após cada criação/edição. Guardas testadas: pontos sem quiz, escolha sem alternativas, posição inexistente, `options` em pergunta de texto, gabarito divergente e formulário fora do modo quiz.
+
+**Decisão de licenças:** duas ideias vieram de um projeto com licença proprietária (KamaruSama) e nada de código foi copiado de lá — reimplementação do zero, como registrado no estudo.
