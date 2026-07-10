@@ -800,6 +800,115 @@ tool(
   }
 );
 
+tool(
+  "verify_answer_keys",
+  {
+    title: "Conferir gabarito",
+    description:
+      "Confere o gabarito de um quiz comparando com o esperado: para cada posição, verifica a(s) resposta(s) " +
+      "correta(s) e, se informados, os pontos. Útil para auditar um quiz recém-montado antes de divulgar.",
+    inputSchema: {
+      formId: z.string().describe("ID do formulário (precisa estar em modo quiz)"),
+      expected: z
+        .array(
+          z.object({
+            index: z.number().int().min(0).describe("Posição do item no formulário (veja com get_form)"),
+            correctAnswers: z.array(z.string()).min(1).describe("Resposta(s) correta(s) esperada(s)"),
+            points: z.number().optional().describe("Pontos esperados (opcional)"),
+          })
+        )
+        .min(1)
+        .describe("Gabarito esperado, item a item"),
+    },
+  },
+  async ({ formId, expected }) => {
+    const form = await fetchForm(formId);
+    if (!form.settings?.quizSettings?.isQuiz) {
+      return fail("Este formulário não está em modo quiz — não há gabarito para conferir.");
+    }
+    const items = form.items || [];
+    const lines = [];
+    let ok = 0;
+    for (const exp of expected) {
+      const item = items[exp.index];
+      if (!item) {
+        lines.push(`✗ posição ${exp.index}: não existe (o formulário tem ${items.length} item(ns)).`);
+        continue;
+      }
+      const q = item.questionItem?.question;
+      if (!q) {
+        lines.push(`✗ posição ${exp.index}: não é uma pergunta, é uma ${describeItem(item)}.`);
+        continue;
+      }
+      const actual = (q.grading?.correctAnswers?.answers || []).map((a) => a.value).sort();
+      const wanted = [...exp.correctAnswers].sort();
+      const sameAnswers = actual.length === wanted.length && actual.every((v, i) => v === wanted[i]);
+      const actualPoints = q.grading?.pointValue ?? 0;
+      const pointsOk = exp.points === undefined || actualPoints === exp.points;
+      if (sameAnswers && pointsOk) {
+        ok++;
+        lines.push(`✓ posição ${exp.index} ("${item.title || "(sem título)"}"): confere.`);
+      } else {
+        const probs = [];
+        if (!sameAnswers) {
+          probs.push(`gabarito esperado [${wanted.join(" | ")}], no formulário [${actual.join(" | ") || "nenhum"}]`);
+        }
+        if (!pointsOk) probs.push(`pontos esperados ${exp.points}, no formulário ${actualPoints}`);
+        lines.push(`✗ posição ${exp.index} ("${item.title || "(sem título)"}"): ${probs.join("; ")}.`);
+      }
+    }
+    const head =
+      ok === expected.length
+        ? `Gabarito confere: ${ok} de ${expected.length} item(ns).`
+        : `Atenção: só ${ok} de ${expected.length} item(ns) conferem.`;
+    return text(`${head}\n${lines.join("\n")}`);
+  }
+);
+
+tool(
+  "auth_status",
+  {
+    title: "Diagnóstico das credenciais",
+    description:
+      "Verifica a configuração de acesso ao Google sem alterar nada: se o arquivo de credenciais existe, " +
+      "se está completo e se o Google aceita o refresh token. Use quando alguma ferramenta falhar por autenticação.",
+    inputSchema: {},
+  },
+  async () => {
+    const lines = [];
+    if (!fs.existsSync(CONFIG_PATH)) {
+      return fail("credentials/config.json não encontrado. Rode 'npm run token' na raiz do projeto para autorizar com o Google.");
+    }
+    lines.push("Arquivo credentials/config.json: encontrado.");
+    let cfg;
+    try {
+      cfg = JSON.parse(fs.readFileSync(CONFIG_PATH, "utf8"));
+    } catch {
+      return fail("credentials/config.json inválido ou corrompido. Rode 'npm run token' para gerá-lo novamente.");
+    }
+    const missing = ["clientId", "clientSecret", "refreshToken"].filter((k) => !cfg[k]);
+    if (missing.length) {
+      return fail(`Campos faltando em credentials/config.json: ${missing.join(", ")}. Rode 'npm run token' para gerá-lo de novo.`);
+    }
+    lines.push("Campos clientId, clientSecret e refreshToken: presentes.");
+    try {
+      // Cliente descartável, separado do memoizado: aqui o objetivo é testar
+      // o config do disco como ele está, sem interferir no cache do servidor.
+      const oauth2 = new google.auth.OAuth2(cfg.clientId, cfg.clientSecret);
+      oauth2.setCredentials({ refresh_token: cfg.refreshToken });
+      const { token } = await oauth2.getAccessToken();
+      lines.push(
+        token
+          ? "Teste com o Google: OK — o refresh token foi aceito e um access token foi emitido."
+          : "Teste com o Google: resposta sem access token. Rode 'npm run token' para reautorizar."
+      );
+    } catch (e) {
+      return fail(`Arquivo de credenciais OK, mas o Google recusou o teste: ${friendlyError(e)}`);
+    }
+    return text(lines.join("\n"));
+  }
+);
+
 // --- Conexão (entrada/saída padrão) -----------------------------------------
 const transport = new StdioServerTransport();
 await server.connect(transport);

@@ -31,6 +31,8 @@ docs/                  → revisão de código e histórico de alterações
 - `move_question` — move um item de uma posição para outra.
 - `list_responses` — lista as respostas, incluindo perguntas de upload de arquivo. Em páginas (padrão 50),
   com `pageSize`/`pageToken` para formulários com muitas respostas.
+- `verify_answer_keys` — confere o gabarito de um quiz contra uma lista esperada (auditoria pós-criação).
+- `auth_status` — diagnóstico das credenciais: arquivo presente, campos completos e teste real com o Google.
 
 ## Como usar (uma vez)
 
