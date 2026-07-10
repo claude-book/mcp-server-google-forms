@@ -287,6 +287,38 @@ tool(
 );
 
 tool(
+  "update_form_info",
+  {
+    title: "Editar título/descrição do formulário",
+    description:
+      "Altera o título e/ou a descrição de um formulário existente (o que aparece no topo para quem responde). " +
+      "O nome do arquivo no Drive (documentTitle) não pode ser alterado pela API depois da criação.",
+    inputSchema: {
+      formId: z.string().describe("ID do formulário"),
+      title: z.string().optional().describe("Novo título"),
+      description: z.string().optional().describe("Nova descrição"),
+    },
+  },
+  async ({ formId, title, description }) => {
+    const info = {};
+    const masks = [];
+    if (title !== undefined) {
+      info.title = title;
+      masks.push("title");
+    }
+    if (description !== undefined) {
+      info.description = description;
+      masks.push("description");
+    }
+    if (!masks.length) return fail("Nada a alterar — informe 'title' e/ou 'description'.");
+    await batchUpdate(formId, [{ updateFormInfo: { info, updateMask: masks.join(",") } }]);
+    return text(
+      `Formulário ${formId} atualizado: ${masks.map((m) => (m === "title" ? "título" : "descrição")).join(" e ")}.`
+    );
+  }
+);
+
+tool(
   "get_form",
   {
     title: "Ver formulário",
@@ -394,6 +426,93 @@ tool(
       { createItem: { item: { title, questionItem: { question } }, location: { index: at } } },
     ]);
     return text(`Pergunta "${title}" adicionada na posição ${at} (contando todos os itens do formulário).`);
+  }
+);
+
+tool(
+  "update_question",
+  {
+    title: "Editar pergunta",
+    description:
+      "Altera uma pergunta existente na posição indicada: enunciado, obrigatoriedade, alternativas, pontos e gabarito — " +
+      "sem apagar e recriar, preservando o vínculo com respostas já recebidas. Confira a posição com get_form.",
+    inputSchema: {
+      formId: z.string().describe("ID do formulário"),
+      index: z.number().int().min(0).describe("Posição do item (começa em 0; veja as posições com get_form)"),
+      title: z.string().optional().describe("Novo enunciado"),
+      required: z.boolean().optional().describe("true = resposta obrigatória; false = opcional"),
+      options: z
+        .array(z.string())
+        .min(1)
+        .optional()
+        .describe("Novas alternativas — substituem TODAS as atuais (só para perguntas de escolha)"),
+      points: z.number().optional().describe("Nova pontuação (exige modo quiz)"),
+      correctAnswers: z
+        .array(z.string())
+        .optional()
+        .describe("Novo gabarito, batendo com as alternativas (exige modo quiz)"),
+    },
+  },
+  async ({ formId, index, title, required, options, points, correctAnswers }) => {
+    const form = await fetchForm(formId);
+    const items = form.items || [];
+    if (index >= items.length) {
+      return fail(`Posição ${index} não existe: o formulário tem ${items.length} item(ns)${items.length ? ` (0 a ${items.length - 1})` : ""}.`);
+    }
+    const existing = items[index];
+    if (!existing.questionItem) {
+      return fail(
+        `O item na posição ${index} não é uma pergunta editável, é uma ${describeItem(existing)}. Nada foi alterado.`
+      );
+    }
+    const item = {};
+    const masks = [];
+    const changes = [];
+    if (title !== undefined) {
+      item.title = title;
+      masks.push("title");
+      changes.push("enunciado");
+    }
+    const q = {};
+    if (required !== undefined) {
+      q.required = required;
+      masks.push("questionItem.question.required");
+      changes.push(required ? "agora obrigatória" : "agora opcional");
+    }
+    if (options) {
+      if (!existing.questionItem.question?.choiceQuestion) {
+        return fail(
+          `A pergunta na posição ${index} não é de escolha (é ${questionKind(existing.questionItem.question || {})}) — 'options' não se aplica.`
+        );
+      }
+      q.choiceQuestion = { options: options.map((v) => ({ value: v })) };
+      masks.push("questionItem.question.choiceQuestion.options");
+      changes.push("alternativas");
+    }
+    if (points !== undefined || correctAnswers !== undefined) {
+      if (!form.settings?.quizSettings?.isQuiz) {
+        return fail(
+          "Este formulário não está em modo quiz — pontos e gabarito só existem em quizzes. Rode set_quiz com isQuiz=true antes."
+        );
+      }
+      // Mescla com a nota existente: mudar só os pontos preserva o gabarito, e vice-versa.
+      const g = existing.questionItem.question?.grading || {};
+      q.grading = { pointValue: points ?? g.pointValue ?? 0 };
+      if (correctAnswers) {
+        q.grading.correctAnswers = { answers: correctAnswers.map((v) => ({ value: v })) };
+      } else if (g.correctAnswers) {
+        q.grading.correctAnswers = g.correctAnswers;
+      }
+      masks.push("questionItem.question.grading");
+      if (points !== undefined) changes.push("pontos");
+      if (correctAnswers) changes.push("gabarito");
+    }
+    if (!masks.length) {
+      return fail("Nada a alterar — informe pelo menos um campo (title, required, options, points ou correctAnswers).");
+    }
+    if (Object.keys(q).length) item.questionItem = { question: q };
+    await batchUpdate(formId, [{ updateItem: { item, location: { index }, updateMask: masks.join(",") } }]);
+    return text(`Pergunta "${existing.title || "(sem título)"}" (posição ${index}) atualizada: ${changes.join(", ")}.`);
   }
 );
 

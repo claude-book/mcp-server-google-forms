@@ -21,6 +21,9 @@ docs/                  → revisão de código e histórico de alterações
 - `get_form` — mostra a lista de itens com as posições e a estrutura completa.
 - `add_question` — acrescenta uma pergunta (no final ou numa posição indicada). Nove tipos: texto curto/longo,
   escolha única, caixas de seleção, lista suspensa, escala linear, data, hora/duração e avaliação (estrelas, corações ou joinhas).
+- `update_form_info` — altera o título e/ou a descrição de um formulário existente.
+- `update_question` — edita uma pergunta existente (enunciado, obrigatoriedade, alternativas, pontos, gabarito)
+  sem apagar e recriar — preserva o vínculo com respostas já recebidas.
 - `set_quiz` — liga ou desliga o modo quiz (com notas). Obrigatório antes de usar `points`.
 - `delete_question` — remove a pergunta na posição indicada (recusa apagar o que não for pergunta).
 - `move_question` — move um item de uma posição para outra.
