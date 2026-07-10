@@ -1,7 +1,7 @@
 # mcp-server-google-forms
 
 [![npm](https://img.shields.io/npm/v/mcp-server-google-forms?label=npm&color=cb3837)](https://www.npmjs.com/package/mcp-server-google-forms)
-[![MCP Registry](https://img.shields.io/badge/MCP%20Registry-io.github.claude--book-6d3fc0)](https://registry.modelcontextprotocol.io/v0/servers?search=io.github.claude-book/mcp-server-google-forms)
+[![MCP Registry](https://img.shields.io/badge/MCP%20Registry-io.github.claude--book-6d3fc0)](https://registry.modelcontextprotocol.io/?q=mcp-server-google-forms)
 [![DOI](https://zenodo.org/badge/1294358395.svg)](https://doi.org/10.5281/zenodo.21296975)
 
 Servidor MCP local que permite ao Claude Code **criar, editar e publicar Google Forms**.
