@@ -7,7 +7,7 @@
   "author": "Henrique Alvarenga da Silva",
   "repository": {
     "type": "git",
-    "url": "https://github.com/claude-book/mcp-server-google-forms.git"
+    "url": "git+https://github.com/claude-book/mcp-server-google-forms.git"
   },
   "keywords": [
     "mcp",
