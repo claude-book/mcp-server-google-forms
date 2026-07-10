@@ -326,6 +326,74 @@ tool(
 );
 
 tool(
+  "build_form",
+  {
+    title: "Criar formulário completo",
+    description:
+      "Cria um formulário inteiro numa única operação: título, descrição, modo quiz e todas as perguntas na ordem dada. " +
+      "Prefira esta ferramenta a encadear create_form + várias add_question. " +
+      "O formulário nasce NÃO publicado: use set_publish para liberar respostas.",
+    inputSchema: {
+      title: z.string().describe("Título do formulário, visível para quem responde"),
+      documentTitle: z.string().optional().describe("Nome do arquivo no Drive (opcional)"),
+      description: z.string().optional().describe("Descrição exibida no topo do formulário (opcional)"),
+      isQuiz: z
+        .boolean()
+        .optional()
+        .describe("true para criar já em modo quiz (obrigatório se alguma pergunta tiver 'points')"),
+      questions: z
+        .array(z.object(questionFields))
+        .min(1)
+        .max(50)
+        .describe("Perguntas, na ordem em que devem aparecer no formulário"),
+    },
+  },
+  async ({ title, documentTitle, description, isQuiz, questions }) => {
+    // Valida TODAS as perguntas antes de criar o formulário: se algo estiver
+    // errado, o erro sai agora e nenhum formulário órfão fica para trás.
+    if (!isQuiz && questions.some((q) => typeof q.points === "number")) {
+      return fail(
+        "Há pergunta com 'points', mas isQuiz não é true. Ative isQuiz para criar um quiz, ou remova os pontos."
+      );
+    }
+    const builtItems = questions.map((q) => ({ title: q.title, questionItem: { question: buildQuestion(q) } }));
+
+    const forms = getFormsClient();
+    const res = await forms.forms.create({
+      requestBody: { info: { title, documentTitle: documentTitle || title } },
+    });
+    const f = res.data;
+
+    const requests = [];
+    if (description) requests.push({ updateFormInfo: { info: { description }, updateMask: "description" } });
+    if (isQuiz) {
+      requests.push({ updateSettings: { settings: { quizSettings: { isQuiz: true } }, updateMask: "quizSettings.isQuiz" } });
+    }
+    builtItems.forEach((item, i) => requests.push({ createItem: { item, location: { index: i } } }));
+    try {
+      await batchUpdate(f.formId, requests);
+    } catch (e) {
+      // O create deu certo mas o preenchimento não: avisa que existe um
+      // formulário vazio e como aproveitá-lo ou descartá-lo.
+      return fail(
+        `O formulário foi criado (formId: ${f.formId}), mas o preenchimento falhou — ele está vazio. ` +
+          `Motivo: ${friendlyError(e)}\n` +
+          `Dá para preenchê-lo com add_question, ou apagá-lo no Drive. Editar: https://docs.google.com/forms/d/${f.formId}/edit`
+      );
+    }
+    return text(
+      [
+        `Formulário "${title}" criado com ${questions.length} pergunta(s)${isQuiz ? " em modo quiz" : ""} ` +
+          `(ainda não publicado — use set_publish para aceitar respostas).`,
+        `formId: ${f.formId}`,
+        `Editar: https://docs.google.com/forms/d/${f.formId}/edit`,
+        `Responder: ${f.responderUri || "(disponível após publicar)"}`,
+      ].join("\n")
+    );
+  }
+);
+
+tool(
   "set_quiz",
   {
     title: "Modo quiz",

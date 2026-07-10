@@ -15,6 +15,7 @@ docs/                  → revisão de código e histórico de alterações
 ## Ferramentas expostas
 
 - `create_form` — cria um formulário (nasce **não publicado**) e devolve o ID e os links.
+- `build_form` — cria o formulário **inteiro numa única operação**: título, descrição, modo quiz e todas as perguntas.
 - `set_publish` — publica ou despublica o formulário (necessário para receber respostas).
 - `get_form` — mostra a lista de itens com as posições e a estrutura completa.
 - `add_question` — acrescenta uma pergunta (no final ou numa posição indicada). Nove tipos: texto curto/longo,
