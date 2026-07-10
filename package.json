@@ -1,6 +1,7 @@
 {
   "name": "mcp-server-google-forms",
-  "version": "0.4.1",
+  "version": "0.4.2",
+  "mcpName": "io.github.claude-book/mcp-server-google-forms",
   "description": "Servidor MCP local para criar, editar e publicar Google Forms a partir do Claude Code",
   "type": "module",
   "license": "MIT",
