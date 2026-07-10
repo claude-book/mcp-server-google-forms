@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+message: "Se você usar este software, cite-o conforme os metadados abaixo."
+title: "mcp-server-google-forms: servidor MCP para Google Forms"
+type: software
+authors:
+  - family-names: "Alvarenga da Silva"
+    given-names: "Henrique"
+    email: henriquealvarenga@gmail.com
+repository-code: "https://github.com/claude-book/mcp-server-google-forms"
+url: "https://claude-book.github.io/mcp-server-google-forms/"
+license: MIT
+keywords:
+  - mcp
+  - model-context-protocol
+  - google-forms
+  - claude
+  - claude-code
+version: 0.4.2
+date-released: 2026-07-10
+abstract: >-
+  Servidor MCP local que permite a assistentes de IA (como o Claude) criar,
+  editar e publicar Google Forms: 15 ferramentas, incluindo criação de
+  formulário completo em uma única operação, quiz com pontuação e gabarito,
+  seções, leitura paginada de respostas e diagnóstico de credenciais.
+  Código de exemplo do livro sobre Claude Code.
