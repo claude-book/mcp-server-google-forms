@@ -1,14 +1,20 @@
-// Ajudante de autorização — rodar UMA vez: `npm run token`.
-// Lê o arquivo de credenciais baixado do Google Cloud (credentials/client_secret*.json),
-// abre o navegador para você autorizar e salva o refreshToken em credentials/config.json.
+#!/usr/bin/env node
+// Ajudante de autorização — rodar UMA vez: `npm run token` (clone) ou
+// `npx -p mcp-server-google-forms mcp-server-google-forms-token` (npm).
+// Lê o arquivo de credenciais baixado do Google Cloud (client_secret*.json),
+// abre o navegador para você autorizar e salva o refreshToken em config.json.
+// A pasta das credenciais é resolvida por src/credentials-dir.js
+// ($GOOGLE_FORMS_MCP_DIR → credentials/ do projeto → ~/.config/mcp-server-google-forms/).
 
 import fs from "node:fs";
 import http from "node:http";
+import path from "node:path";
 import crypto from "node:crypto";
 import { exec } from "node:child_process";
 import { google } from "googleapis";
+import { credentialsDir } from "../src/credentials-dir.js";
 
-const CRED_DIR = new URL("../credentials/", import.meta.url);
+const CRED_DIR = credentialsDir();
 
 // Escopos: criar/editar o corpo do formulário, LER respostas e acessar arquivos criados por este app.
 const SCOPES = [
@@ -24,12 +30,12 @@ const credFile = fs
   .find((f) => f.startsWith("client_secret") && f.endsWith(".json"));
 if (!credFile) {
   console.error(
-    "Não encontrei nenhum 'client_secret*.json' na pasta credentials/.\n" +
-      "Baixe o arquivo de credenciais (tipo 'App para computador') do Google Cloud e coloque-o em credentials/."
+    `Não encontrei nenhum 'client_secret*.json' em ${CRED_DIR}\n` +
+      "Baixe o arquivo de credenciais (tipo 'App para computador') do Google Cloud e coloque-o nessa pasta."
   );
   process.exit(1);
 }
-const raw = JSON.parse(fs.readFileSync(new URL(credFile, CRED_DIR), "utf8"));
+const raw = JSON.parse(fs.readFileSync(path.join(CRED_DIR, credFile), "utf8"));
 const creds = raw.installed || raw.web;
 if (!creds) {
   console.error("Formato de credenciais inesperado. Use credenciais OAuth do tipo 'App para computador'.");
@@ -67,8 +73,9 @@ const httpServer = http.createServer(async (req, res) => {
       httpServer.close(() => process.exit(1));
       return;
     }
+    const configFile = path.join(CRED_DIR, "config.json");
     fs.writeFileSync(
-      new URL("config.json", CRED_DIR),
+      configFile,
       JSON.stringify(
         { clientId: creds.client_id, clientSecret: creds.client_secret, refreshToken: tokens.refresh_token },
         null,
@@ -78,7 +85,7 @@ const httpServer = http.createServer(async (req, res) => {
     // O callback do res.end garante que o navegador recebe a página de sucesso
     // antes de o processo encerrar.
     res.end("Autorização concluída! Pode fechar esta aba e voltar ao terminal.", () => {
-      console.log("\nPronto. refreshToken salvo em credentials/config.json.");
+      console.log(`\nPronto. refreshToken salvo em ${configFile}`);
       httpServer.close(() => process.exit(0));
     });
   } catch (e) {

@@ -14,8 +14,9 @@ import { google } from "googleapis";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
+import { configPath, TOKEN_HELP } from "./credentials-dir.js";
 
-const CONFIG_PATH = new URL("../credentials/config.json", import.meta.url);
+const CONFIG_PATH = configPath();
 // A versão vem do package.json para não existirem duas fontes de verdade.
 const pkg = JSON.parse(fs.readFileSync(new URL("../package.json", import.meta.url), "utf8"));
 
@@ -27,16 +28,16 @@ let formsClient = null;
 function getFormsClient() {
   if (formsClient) return formsClient;
   if (!fs.existsSync(CONFIG_PATH)) {
-    throw new Error("credentials/config.json não encontrado. Rode 'npm run token' na raiz do projeto para autorizar com o Google.");
+    throw new Error(`Arquivo de credenciais não encontrado (${CONFIG_PATH}). ${TOKEN_HELP}`);
   }
   let cfg;
   try {
     cfg = JSON.parse(fs.readFileSync(CONFIG_PATH, "utf8"));
   } catch {
-    throw new Error("credentials/config.json inválido ou corrompido. Rode 'npm run token' para gerá-lo novamente.");
+    throw new Error(`Arquivo de credenciais inválido ou corrompido (${CONFIG_PATH}). ${TOKEN_HELP}`);
   }
   if (!cfg.refreshToken) {
-    throw new Error("Falta o refreshToken em credentials/config.json. Rode 'npm run token' para gerá-lo.");
+    throw new Error(`Falta o refreshToken em ${CONFIG_PATH}. ${TOKEN_HELP}`);
   }
   const oauth2 = new google.auth.OAuth2(cfg.clientId, cfg.clientSecret);
   oauth2.setCredentials({ refresh_token: cfg.refreshToken });
@@ -59,7 +60,7 @@ function friendlyError(e) {
   const raw = data?.error_description || data?.error?.message || e?.message || String(e);
   const status = e?.response?.status ?? e?.code;
   if (isAuthError(e)) {
-    return "Credenciais expiradas ou revogadas pelo Google. Rode 'npm run token' para autorizar de novo.";
+    return `Credenciais expiradas ou revogadas pelo Google. ${TOKEN_HELP}`;
   }
   if (status === 403) return `Sem permissão para esta operação. Verifique se a API do Google Forms está ativada no projeto do Google Cloud e se o formulário pertence à sua conta. Detalhe: ${raw}`;
   if (status === 404) return "Formulário não encontrado — confira o formId.";
@@ -881,18 +882,18 @@ tool(
   async () => {
     const lines = [];
     if (!fs.existsSync(CONFIG_PATH)) {
-      return fail("credentials/config.json não encontrado. Rode 'npm run token' na raiz do projeto para autorizar com o Google.");
+      return fail(`Arquivo de credenciais não encontrado (${CONFIG_PATH}). ${TOKEN_HELP}`);
     }
-    lines.push("Arquivo credentials/config.json: encontrado.");
+    lines.push(`Arquivo de credenciais: encontrado (${CONFIG_PATH}).`);
     let cfg;
     try {
       cfg = JSON.parse(fs.readFileSync(CONFIG_PATH, "utf8"));
     } catch {
-      return fail("credentials/config.json inválido ou corrompido. Rode 'npm run token' para gerá-lo novamente.");
+      return fail(`Arquivo de credenciais inválido ou corrompido (${CONFIG_PATH}). ${TOKEN_HELP}`);
     }
     const missing = ["clientId", "clientSecret", "refreshToken"].filter((k) => !cfg[k]);
     if (missing.length) {
-      return fail(`Campos faltando em credentials/config.json: ${missing.join(", ")}. Rode 'npm run token' para gerá-lo de novo.`);
+      return fail(`Campos faltando em ${CONFIG_PATH}: ${missing.join(", ")}. ${TOKEN_HELP}`);
     }
     lines.push("Campos clientId, clientSecret e refreshToken: presentes.");
     try {

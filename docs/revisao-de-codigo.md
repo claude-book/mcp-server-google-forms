@@ -289,3 +289,20 @@ Revendo a decisão acima, o autor optou por concluir a verificação da marca. O
 **Verificação:** cada commit foi testado **contra a API real do Google** antes de entrar, via cliente MCP de teste falando stdio com o servidor de verdade — incluindo 3 respostas reais enviadas pelo endpoint público para provar a paginação, e a conferência das estruturas gravadas (`forms.get`) após cada criação/edição. Guardas testadas: pontos sem quiz, escolha sem alternativas, posição inexistente, `options` em pergunta de texto, gabarito divergente e formulário fora do modo quiz.
 
 **Decisão de licenças:** duas ideias vieram de um projeto com licença proprietária (KamaruSama) e nada de código foi copiado de lá — reimplementação do zero, como registrado no estudo.
+
+### 10/07/2026 — Preparação para publicação no npm (v0.4.1)
+
+**Origem:** decisão do autor de publicar o pacote no npm (melhoria 9 do [estudo de MCPs similares](estudo-de-mcps-similares.md)), já adaptada às **novas regras de segurança do npm anunciadas em 08/07/2026** (npm v12): scripts de instalação de dependências desativados por padrão, e tokens que contornam 2FA perdendo poderes (operações sensíveis em ago/2026; publicação direta em jan/2027).
+
+**O que mudou:**
+
+- **Credenciais fora da pasta do projeto** — novo módulo `src/credentials-dir.js`, compartilhado pelo servidor e pelo script de autorização, resolve a pasta de credenciais nesta ordem: `$GOOGLE_FORMS_MCP_DIR` → `credentials/` do projeto (clone) → `~/.config/mcp-server-google-forms/` (npm/npx). Antes o caminho era fixo e relativo ao pacote — quebraria no cache do npx.
+- **Segundo binário** — `mcp-server-google-forms-token` (o `scripts/get-token.js`, agora com shebang) para autorizar sem clonar o repositório.
+- **Mensagens de erro** informam o caminho real resolvido, em vez do fixo "credentials/config.json".
+- **`package.json`** — removido `"private": true`, adicionados `files` (o pacote leva apenas `src/` e `scripts/` — 6 arquivos, 16 kB, sem docs e sem qualquer credencial) e `keywords`.
+- **Nome conferido no registro:** `mcp-server-google-forms` está livre (o vizinho `google-forms-mcp` já é ocupado).
+- **README** — seções novas: instalação via npm e onde ficam as credenciais.
+
+**Decisão sobre as regras novas do npm:** nada de tokens de longa duração — a publicação será **interativa com 2FA** (imune às depreciações anunciadas); quando o projeto ganhar CI, migrar para **Trusted Publishing (OIDC)**, o caminho recomendado. O pacote não tem scripts de instalação (`postinstall` etc.), então a instalação continua funcionando com os bloqueios do npm v12.
+
+**Verificação:** simulação completa da instalação npm — `npm pack`, tarball extraído fora do projeto, dependências instaladas, e o servidor rodando do pacote extraído respondeu ao `auth_status` com sucesso usando `GOOGLE_FORMS_MCP_DIR` (teste real de refresh aceito pelo Google); sem a variável e sem a pasta do projeto, a resolução caiu corretamente em `~/.config/mcp-server-google-forms`; regressão do caso clone OK (`credentials/` do projeto).

@@ -1,20 +1,31 @@
 {
   "name": "mcp-server-google-forms",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Servidor MCP local para criar, editar e publicar Google Forms a partir do Claude Code",
   "type": "module",
-  "private": true,
   "license": "MIT",
   "author": "Henrique Alvarenga da Silva",
   "repository": {
     "type": "git",
     "url": "https://github.com/claude-book/mcp-server-google-forms.git"
   },
+  "keywords": [
+    "mcp",
+    "modelcontextprotocol",
+    "google-forms",
+    "claude",
+    "claude-code"
+  ],
   "engines": {
     "node": ">=18"
   },
+  "files": [
+    "src",
+    "scripts"
+  ],
   "bin": {
-    "mcp-server-google-forms": "src/server.js"
+    "mcp-server-google-forms": "src/server.js",
+    "mcp-server-google-forms-token": "scripts/get-token.js"
   },
   "scripts": {
     "token": "node scripts/get-token.js",

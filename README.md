@@ -73,9 +73,27 @@ docs/                  → revisão de código e histórico de alterações
 - [Estudo de MCPs similares](docs/estudo-de-mcps-similares.md) — comparação com 7 servidores MCP para Google Forms do GitHub, melhorias adotadas e anti-padrões a evitar.
 - [Versão em HTML](docs/revisao-de-codigo.html) — o mesmo relatório em formato amigável para não-programadores (abra no navegador).
 
+## Instalação via npm (alternativa ao clone)
+
+Com o pacote publicado no npm, dá para pular o clone:
+
+1. Baixe o `client_secret*.json` do Google Cloud (passo 2 acima) e coloque-o em `~/.config/mcp-server-google-forms/` (crie a pasta).
+2. Autorize: `npx -p mcp-server-google-forms mcp-server-google-forms-token`
+3. Registre no Claude Code: `claude mcp add google-forms -- npx mcp-server-google-forms`
+
+## Onde ficam as credenciais
+
+O servidor e o script de autorização procuram as credenciais nesta ordem:
+
+1. Na pasta definida pela variável de ambiente `GOOGLE_FORMS_MCP_DIR`, se houver;
+2. Em `credentials/` dentro do projeto, se a pasta existir (instalação por clone);
+3. Em `~/.config/mcp-server-google-forms/` (instalação via npm/npx).
+
 ## Arquivos sensíveis
 
-Tudo em `credentials/` guarda segredos — a pasta inteira está no `.gitignore` e nunca deve ser commitada.
+Tudo na pasta de credenciais guarda segredos — no caso do clone, a pasta `credentials/` inteira está no
+`.gitignore` e nunca deve ser commitada. O pacote npm é gerado só com `src/` e `scripts/` (campo `files`
+do `package.json`), então credenciais jamais entram no pacote.
 
 ## Licença
 
