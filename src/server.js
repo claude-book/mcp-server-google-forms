@@ -92,6 +92,44 @@ function describeItem(item) {
   return `item "${title}"`;
 }
 
+// Nome amigável do tipo de uma pergunta (o objeto question da API).
+function questionKind(q) {
+  if (q.textQuestion) return q.textQuestion.paragraph ? "texto longo" : "texto curto";
+  if (q.choiceQuestion) {
+    const map = { RADIO: "múltipla escolha", CHECKBOX: "caixas de seleção", DROP_DOWN: "lista suspensa" };
+    return map[q.choiceQuestion.type] || "escolha";
+  }
+  if (q.scaleQuestion) return `escala ${q.scaleQuestion.low}–${q.scaleQuestion.high}`;
+  if (q.dateQuestion) return q.dateQuestion.includeTime ? "data e hora" : "data";
+  if (q.timeQuestion) return q.timeQuestion.duration ? "duração" : "hora";
+  if (q.ratingQuestion) return `avaliação (${q.ratingQuestion.ratingScaleLevel} níveis)`;
+  if (q.fileUploadQuestion) return "upload de arquivo";
+  return "tipo desconhecido";
+}
+
+// Linha detalhada de um item para o get_form: tipo, obrigatoriedade,
+// alternativas, rótulos de escala e pontuação/gabarito (quiz).
+function describeItemDetail(item) {
+  const q = item.questionItem?.question;
+  if (!q) return describeItem(item);
+  const attrs = [questionKind(q)];
+  if (q.required) attrs.push("obrigatória");
+  const extra = [];
+  if (q.choiceQuestion?.options) {
+    extra.push(`opções: ${q.choiceQuestion.options.map((o) => o.value ?? (o.isOther ? "(Outro)" : "?")).join(" | ")}`);
+  }
+  if (q.scaleQuestion?.lowLabel || q.scaleQuestion?.highLabel) {
+    extra.push(`rótulos: "${q.scaleQuestion.lowLabel || ""}" → "${q.scaleQuestion.highLabel || ""}"`);
+  }
+  if (q.grading) {
+    let g = `vale ${q.grading.pointValue ?? 0} ponto(s)`;
+    const ca = q.grading.correctAnswers?.answers?.map((a) => a.value);
+    if (ca?.length) g += `; correta(s): ${ca.join(" | ")}`;
+    extra.push(g);
+  }
+  return `pergunta "${item.title || "(sem título)"}" — ${attrs.join(", ")}${extra.length ? `; ${extra.join("; ")}` : ""}`;
+}
+
 // Monta o objeto de pergunta conforme um "tipo" amigável, com nota opcional (quiz).
 // Recebe a especificação completa (mesmos nomes dos parâmetros das ferramentas).
 function buildQuestion(spec) {
@@ -235,15 +273,31 @@ tool(
   {
     title: "Ver formulário",
     description:
-      "Retorna a estrutura de um formulário: a lista de itens com as posições (use-as em add_question, delete_question e move_question) e o JSON completo.",
-    inputSchema: { formId: z.string().describe("ID do formulário") },
+      "Mostra a estrutura de um formulário: dados gerais e a lista de itens com as posições " +
+      "(use-as em add_question, delete_question e move_question). Com raw=true, inclui também o JSON completo da API.",
+    inputSchema: {
+      formId: z.string().describe("ID do formulário"),
+      raw: z
+        .boolean()
+        .optional()
+        .describe("true para incluir também o JSON completo da API (saída bem maior; só quando o resumo não bastar)"),
+    },
   },
-  async ({ formId }) => {
+  async ({ formId, raw }) => {
     const form = await fetchForm(formId);
-    const items = (form.items || []).map((it, i) => `${i}: ${describeItem(it)}`);
-    return text(
-      `Itens (posição: tipo):\n${items.join("\n") || "(formulário vazio)"}\n\nJSON completo:\n${JSON.stringify(form, null, 2)}`
-    );
+    const items = form.items || [];
+    const head = [`Formulário "${form.info?.title || "(sem título)"}" — formId: ${form.formId}`];
+    if (form.info?.description) head.push(`Descrição: ${form.info.description}`);
+    head.push(`Modo quiz: ${form.settings?.quizSettings?.isQuiz ? "sim" : "não"}`);
+    const pub = form.publishSettings?.publishState;
+    if (pub) {
+      head.push(`Publicado: ${pub.isPublished ? `sim (aceitando respostas: ${pub.isAcceptingResponses ? "sim" : "não"})` : "não"}`);
+    }
+    if (form.responderUri) head.push(`Responder: ${form.responderUri}`);
+    const lines = items.map((it, i) => `${i}: ${describeItemDetail(it)}`);
+    let out = `${head.join("\n")}\n\nItens (posição: descrição):\n${lines.join("\n") || "(formulário vazio)"}`;
+    if (raw) out += `\n\nJSON completo:\n${JSON.stringify(form, null, 2)}`;
+    return text(out);
   }
 );
 
