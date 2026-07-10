@@ -79,6 +79,17 @@ async function batchUpdate(formId, requests) {
   await forms.forms.batchUpdate({ formId, requestBody: { requests } });
 }
 
+// Frase sobre o estado de publicação de um formulário recém-criado, a partir
+// do que a API respondeu — em vez de assumir um padrão fixo (o padrão do
+// Google já mudou ao longo do tempo; ver docs/estudo-de-mcps-similares.md).
+function publishStateLine(form) {
+  const state = form.publishSettings?.publishState;
+  if (!state) return "estado de publicação não informado pela API — confira com get_form";
+  return state.isPublished
+    ? "já publicado e aceitando respostas"
+    : "não publicado — use set_publish para liberar respostas";
+}
+
 // Descreve um item do formulário para mensagens (as posições contam TODOS os
 // itens — perguntas, blocos de texto, imagens, vídeos e quebras de seção).
 function describeItem(item) {
@@ -219,20 +230,27 @@ tool(
   {
     title: "Criar formulário",
     description:
-      "Cria um novo Google Form vazio e retorna o ID, o link de edição e o link de respostas. O formulário nasce NÃO publicado: use set_publish para liberar respostas.",
+      "Cria um novo Google Form vazio e retorna o ID, o link de edição e o link de respostas. " +
+      "Por padrão o Google cria o formulário JÁ PUBLICADO; use unpublished=true para criá-lo como rascunho. " +
+      "A resposta informa o estado real de publicação.",
     inputSchema: {
       title: z.string().describe("Título do formulário, visível para quem responde"),
       documentTitle: z.string().optional().describe("Nome do arquivo no Drive (opcional)"),
+      unpublished: z
+        .boolean()
+        .optional()
+        .describe("true para criar como rascunho (ninguém responde até set_publish). Padrão: publicado."),
     },
   },
-  async ({ title, documentTitle }) => {
+  async ({ title, documentTitle, unpublished }) => {
     const forms = getFormsClient();
     const res = await forms.forms.create({
+      ...(unpublished ? { unpublished: true } : {}),
       requestBody: { info: { title, documentTitle: documentTitle || title } },
     });
     const f = res.data;
     return text([
-      `Formulário criado (ainda não publicado — use set_publish para aceitar respostas).`,
+      `Formulário criado (${publishStateLine(f)}).`,
       `formId: ${f.formId}`,
       `Editar: https://docs.google.com/forms/d/${f.formId}/edit`,
       `Responder: ${f.responderUri || "(disponível após publicar)"}`,
@@ -386,7 +404,7 @@ tool(
     description:
       "Cria um formulário inteiro numa única operação: título, descrição, modo quiz e todas as perguntas na ordem dada. " +
       "Prefira esta ferramenta a encadear create_form + várias add_question. " +
-      "O formulário nasce NÃO publicado: use set_publish para liberar respostas.",
+      "Por padrão o Google cria o formulário JÁ PUBLICADO; use unpublished=true para criá-lo como rascunho.",
     inputSchema: {
       title: z.string().describe("Título do formulário, visível para quem responde"),
       documentTitle: z.string().optional().describe("Nome do arquivo no Drive (opcional)"),
@@ -395,6 +413,10 @@ tool(
         .boolean()
         .optional()
         .describe("true para criar já em modo quiz (obrigatório se alguma pergunta tiver 'points')"),
+      unpublished: z
+        .boolean()
+        .optional()
+        .describe("true para criar como rascunho (ninguém responde até set_publish). Padrão: publicado."),
       questions: z
         .array(z.object(questionFields))
         .min(1)
@@ -402,7 +424,7 @@ tool(
         .describe("Perguntas, na ordem em que devem aparecer no formulário"),
     },
   },
-  async ({ title, documentTitle, description, isQuiz, questions }) => {
+  async ({ title, documentTitle, description, isQuiz, unpublished, questions }) => {
     // Valida TODAS as perguntas antes de criar o formulário: se algo estiver
     // errado, o erro sai agora e nenhum formulário órfão fica para trás.
     if (!isQuiz && questions.some((q) => typeof q.points === "number")) {
@@ -414,6 +436,7 @@ tool(
 
     const forms = getFormsClient();
     const res = await forms.forms.create({
+      ...(unpublished ? { unpublished: true } : {}),
       requestBody: { info: { title, documentTitle: documentTitle || title } },
     });
     const f = res.data;
@@ -437,8 +460,7 @@ tool(
     }
     return text(
       [
-        `Formulário "${title}" criado com ${questions.length} pergunta(s)${isQuiz ? " em modo quiz" : ""} ` +
-          `(ainda não publicado — use set_publish para aceitar respostas).`,
+        `Formulário "${title}" criado com ${questions.length} pergunta(s)${isQuiz ? " em modo quiz" : ""} (${publishStateLine(f)}).`,
         `formId: ${f.formId}`,
         `Editar: https://docs.google.com/forms/d/${f.formId}/edit`,
         `Responder: ${f.responderUri || "(disponível após publicar)"}`,

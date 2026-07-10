@@ -14,9 +14,10 @@ docs/                  → revisão de código e histórico de alterações
 
 ## Ferramentas expostas
 
-- `create_form` — cria um formulário (nasce **não publicado**) e devolve o ID e os links.
+- `create_form` — cria um formulário e devolve o ID e os links. Por padrão o Google o cria **já publicado**;
+  use `unpublished=true` para criar como rascunho. A resposta informa o estado real.
 - `build_form` — cria o formulário **inteiro numa única operação**: título, descrição, modo quiz e todas as perguntas.
-- `set_publish` — publica ou despublica o formulário (necessário para receber respostas).
+- `set_publish` — publica ou despublica o formulário (libera ou bloqueia respostas).
 - `get_form` — mostra a lista de itens com as posições e a estrutura completa.
 - `add_question` — acrescenta uma pergunta (no final ou numa posição indicada). Nove tipos: texto curto/longo,
   escolha única, caixas de seleção, lista suspensa, escala linear, data, hora/duração e avaliação (estrelas, corações ou joinhas).
@@ -44,9 +45,11 @@ docs/                  → revisão de código e histórico de alterações
 
 ## Fluxo típico
 
-`create_form` → `add_question` (com `set_quiz` antes, se houver pontos) → `set_publish` → compartilhar o link → `list_responses`.
+`build_form` (ou `create_form` → `add_question`) → compartilhar o link de resposta → `list_responses`.
 
-> Desde 30/06/2026, formulários criados via API nascem **não publicados** — por isso o passo `set_publish`.
+> **Sobre publicação:** verificamos na prática (10/07/2026) que a API cria formulários **já publicados** por padrão,
+> ao contrário do que a documentação do Google sugeria. Por isso as ferramentas de criação aceitam `unpublished=true`
+> (criar como rascunho) e **informam o estado real** devolvido pela API — e o `set_publish` cobre os dois sentidos.
 
 ## Solução de problemas
 
