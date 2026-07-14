@@ -7,14 +7,8 @@
 Servidor MCP local que permite ao Claude Code **criar, editar e publicar Google Forms**.
 Código de exemplo do livro sobre Claude Code — instale pelo npm (ou clone), autorize com a sua conta Google e use.
 
-## Estrutura da pasta
-
-```
-src/server.js          → o servidor MCP
-scripts/get-token.js   → autorização OAuth (rodar uma vez)
-credentials/           → segredos locais (client_secret*.json e config.json) — fora do git
-docs/                  → revisão de código e histórico de alterações
-```
+> **Nunca mexeu com terminal? Sem problema.** O passo a passo abaixo foi escrito para quem **não programa**:
+> é só copiar e colar os comandos. Você faz esta configuração **uma única vez**; depois, é só conversar com o Claude.
 
 ## Ferramentas expostas
 
@@ -38,7 +32,93 @@ docs/                  → revisão de código e histórico de alterações
 - `verify_answer_keys` — confere o gabarito de um quiz contra uma lista esperada (auditoria pós-criação).
 - `auth_status` — diagnóstico das credenciais: arquivo presente, campos completos e teste real com o Google.
 
-## Como usar (uma vez)
+---
+
+## Antes de começar (o que você precisa ter)
+
+1. **Node.js 18 ou mais novo.** É o programa que faz o servidor rodar; os comandos `npm` e `npx` vêm junto com ele.
+   - Para conferir se já tem, abra o terminal (veja abaixo) e digite `node --version`. Se aparecer algo como
+     `v18.0.0` ou maior, está pronto. Se der "comando não encontrado", baixe a versão **LTS** em
+     [nodejs.org](https://nodejs.org) e instale (é só avançar/próximo).
+2. **O Claude Code instalado** — é por ele que você vai conversar com o servidor. Instruções em
+   [code.claude.com/docs](https://code.claude.com/docs).
+3. **Uma conta Google** (a mesma em que os formulários vão aparecer).
+
+**Como abrir o terminal** (é onde você cola os comandos):
+- **Mac:** aperte `Cmd + Espaço`, digite *Terminal* e dê Enter.
+- **Windows:** menu Iniciar → digite *PowerShell* → abra o **Windows PowerShell**.
+- **Linux:** procure por *Terminal* no menu de aplicativos (ou `Ctrl + Alt + T`).
+
+---
+
+## Passo 1 — Preparar o Google Cloud (uma vez)
+
+Isto autoriza o servidor a falar com o Google Forms **em seu nome**. Parece longo, mas você faz só uma vez.
+Acesse [console.cloud.google.com](https://console.cloud.google.com) e faça login com a sua conta Google.
+
+1. **Crie um projeto.** No topo da página, clique no seletor de projetos → **Novo projeto** → dê um nome
+   (ex.: `meus-forms`) → **Criar**. Depois, confira que ele está selecionado no topo.
+2. **Ative a Google Forms API.** Na barra de busca do topo, procure por **Google Forms API**, abra o resultado
+   e clique em **Ativar**.
+3. **Configure a tela de permissão.** No menu (☰) → **APIs e serviços** → **Tela de permissão OAuth**.
+   Escolha o tipo **Externo** → **Criar**. Preencha o **nome do app** (ex.: `Meus Forms`), o **e-mail de suporte**
+   e o **e-mail de contato do desenvolvedor** (pode ser o seu mesmo) → salve avançando as telas.
+4. **Adicione-se como usuário de teste — este é o passo que mais gente esquece.** Ainda na Tela de permissão,
+   na seção **Usuários de teste**, clique em **Adicionar usuários** e coloque **o seu próprio e-mail do Google**.
+   Sem isso, o Google recusa a autorização com "acesso negado".
+5. **Crie a credencial.** No menu → **APIs e serviços** → **Credenciais** → **Criar credenciais** →
+   **ID do cliente OAuth** → em "Tipo de aplicativo" escolha **App para computador** → **Criar**.
+6. **Baixe o arquivo.** Na janela que aparece (ou no ícone de download ⬇ ao lado da credencial), clique em
+   **Fazer download do JSON**. Esse é o seu `client_secret*.json`. Guarde-o — você vai usá-lo no Passo 2.
+
+---
+
+## Passo 2 — Instalar e autorizar
+
+Escolha **um** dos dois caminhos. O **Caminho A** é o mais simples e não exige baixar o código.
+
+### Caminho A — via npm (recomendado, sem clonar nada)
+
+1. **Rode o comando de autorização uma primeira vez.** Ele ainda vai falhar de propósito — mas já cria a pasta
+   certa e mostra o caminho dela. No terminal, cole:
+   ```
+   npx -p mcp-server-google-forms mcp-server-google-forms-token
+   ```
+   Vai aparecer uma mensagem como *"Não encontrei nenhum 'client_secret*.json' em …/.config/mcp-server-google-forms"*.
+   Anote (ou copie) esse caminho — é para lá que vai o arquivo.
+2. **Coloque o `client_secret*.json` naquela pasta.** Ela é oculta, então use o atalho de "ir para a pasta":
+   - **Mac:** no Finder, `Cmd + Shift + G`, cole `~/.config/mcp-server-google-forms` e dê Enter. Arraste o arquivo para lá.
+   - **Windows:** no Explorer, clique na barra de endereço, cole `%USERPROFILE%\.config\mcp-server-google-forms` e dê Enter.
+   - **Linux:** no gerenciador de arquivos, `Ctrl + L`, cole `~/.config/mcp-server-google-forms` e dê Enter.
+3. **Rode o mesmo comando de novo.** Agora o navegador abre sozinho:
+   ```
+   npx -p mcp-server-google-forms mcp-server-google-forms-token
+   ```
+   - Escolha a sua conta Google.
+   - Vai aparecer a tela **"O Google não verificou este app"**. Isso é **normal** (o app é seu e está em modo de teste).
+     Clique em **Avançado** → **Acessar Meus Forms (não seguro)**. Pode confiar: é o seu próprio app, rodando na sua máquina.
+   - Confirme as permissões. No terminal aparece *"Pronto. refreshToken salvo…"* — deu certo.
+4. **Registre no Claude Code:**
+   ```
+   claude mcp add google-forms -- npx mcp-server-google-forms
+   ```
+
+> **Por que a pasta fica "oculta"?**
+> O caminho começa com um ponto (`.config`) e, por isso, a pasta não aparece por padrão no Explorer (Windows)
+> nem no Finder (Mac). Isso é intencional.
+>
+> Programas costumam guardar suas configurações — preferências, credenciais, chaves de acesso — em uma pasta
+> reservada, para não espalhar arquivos pela sua pasta de usuário. Por convenção, essas pastas ficam agrupadas
+> em `~/.config` (o `~` representa a sua pasta de usuário), e o ponto no início do nome faz o sistema não exibi-las
+> na navegação normal. No Windows, o caminho equivalente é `C:\Users\SeuNome\.config\mcp-server-google-forms`,
+> e essa pasta também fica oculta por padrão.
+>
+> "Oculta" não significa "protegida": a pasta é sua e pode ser aberta a qualquer momento — foi o que fizemos ao
+> colar o caminho na barra de endereço. O ponto apenas evita que ela apareça junto dos seus documentos. É o local
+> padrão onde ferramentas de linha de comando esperam encontrar esse tipo de arquivo, e por isso o servidor guarda
+> ali o seu `client_secret.json` e a autorização.
+
+### Caminho B — via clone do repositório (para quem for mexer no código)
 
 1. **Clone e instale:**
    ```
@@ -46,29 +126,53 @@ docs/                  → revisão de código e histórico de alterações
    cd mcp-server-google-forms
    npm install
    ```
-2. **No Google Cloud** ([console.cloud.google.com](https://console.cloud.google.com)): crie um projeto,
-   **ative a Google Forms API**, crie credenciais OAuth do tipo **App para computador** e baixe o
-   arquivo `client_secret*.json`. Coloque-o na pasta `credentials/` (crie-a se não existir).
-3. **Autorize:** rode `npm run token` e aprove no navegador. Isso gera `credentials/config.json`.
+2. **Coloque o `client_secret*.json`** na pasta `credentials/` dentro do projeto (crie-a se não existir).
+3. **Autorize:** rode `npm run token` e aprove no navegador (mesma tela do Google descrita no Caminho A,
+   incluindo o aviso de "app não verificado"). Isso gera `credentials/config.json`.
 4. **Registre no Claude Code** (rodando na raiz do projeto):
    ```
    claude mcp add google-forms -- node "$(pwd)/src/server.js"
    ```
 
-## Fluxo típico
+---
 
-`build_form` (ou `create_form` → `add_question`) → compartilhar o link de resposta → `list_responses`.
+## Passo 3 — Peça ao Claude
+
+Pronto! Abra o Claude Code e peça em português, por exemplo:
+
+> *"Crie um quiz de 5 perguntas sobre fotossíntese, valendo 2 pontos cada, e me dê o link para compartilhar."*
+
+Fluxo típico: `build_form` (ou `create_form` → `add_question`) → compartilhar o link de resposta → `list_responses`.
 
 > **Sobre publicação:** verificamos na prática (10/07/2026) que a API cria formulários **já publicados** por padrão,
 > ao contrário do que a documentação do Google sugeria. Por isso as ferramentas de criação aceitam `unpublished=true`
 > (criar como rascunho) e **informam o estado real** devolvido pela API — e o `set_publish` cobre os dois sentidos.
 
+---
+
 ## Solução de problemas
 
-- **"Credenciais expiradas ou revogadas"** — rode `npm run token` de novo e repita o comando; o servidor
-  recarrega as credenciais sozinho, sem precisar reiniciar. Importante: enquanto o app OAuth estiver em modo
-  **Testing** no Google Cloud, o Google expira a autorização a cada **7 dias**. Para tokens duradouros,
-  publique o app (tela de permissão OAuth → **In production**).
+- **"O Google não verificou este app"** (tela laranja durante a autorização) — é esperado enquanto o seu app OAuth
+  está em modo **Testing**. Clique em **Avançado** → **Acessar … (não seguro)**. É o seu próprio app; não há risco.
+- **"Acesso negado" / `access_denied` ao autorizar** — quase sempre é porque você **não se adicionou como usuário de teste**
+  (Passo 1.4). Volte à Tela de permissão OAuth, adicione o seu e-mail em **Usuários de teste** e tente de novo.
+- **"Credenciais expiradas ou revogadas"** — rode o comando de autorização de novo (`npm run token` no clone, ou
+  `npx -p mcp-server-google-forms mcp-server-google-forms-token` no npm) e repita; o servidor recarrega as credenciais
+  sozinho, sem precisar reiniciar. Importante: enquanto o app OAuth estiver em modo **Testing** no Google Cloud, o Google
+  expira a autorização a cada **7 dias**. Para tokens duradouros, publique o app (Tela de permissão OAuth → **In production**).
+- **O Google não enviou o refresh token** — se a mensagem pedir, remova o acesso deste app em
+  [myaccount.google.com/permissions](https://myaccount.google.com/permissions) e rode a autorização mais uma vez.
+
+Para um diagnóstico rápido, peça ao Claude para rodar a ferramenta `auth_status`: ela testa as credenciais direto com o Google.
+
+## Estrutura da pasta
+
+```
+src/server.js          → o servidor MCP
+scripts/get-token.js   → autorização OAuth (rodar uma vez)
+credentials/           → segredos locais (client_secret*.json e config.json) — fora do git
+docs/                  → revisão de código e histórico de alterações
+```
 
 ## Documentação
 
@@ -76,14 +180,6 @@ docs/                  → revisão de código e histórico de alterações
 - [Revisão de código](docs/revisao-de-codigo.md) — problemas conhecidos, gravidade, status das correções e histórico de alterações com as razões de cada mudança.
 - [Estudo de MCPs similares](docs/estudo-de-mcps-similares.md) — comparação com 7 servidores MCP para Google Forms do GitHub, melhorias adotadas e anti-padrões a evitar.
 - [Versão em HTML](docs/revisao-de-codigo.html) — o mesmo relatório em formato amigável para não-programadores (abra no navegador).
-
-## Instalação via npm (alternativa ao clone)
-
-Com o pacote publicado no npm, dá para pular o clone:
-
-1. Baixe o `client_secret*.json` do Google Cloud (passo 2 acima) e coloque-o em `~/.config/mcp-server-google-forms/` (crie a pasta).
-2. Autorize: `npx -p mcp-server-google-forms mcp-server-google-forms-token`
-3. Registre no Claude Code: `claude mcp add google-forms -- npx mcp-server-google-forms`
 
 ## Onde ficam as credenciais
 

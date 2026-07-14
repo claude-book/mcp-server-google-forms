@@ -29,6 +29,7 @@
   h1 { font-size: 2rem; line-height: 1.2; margin: 0 0 .75rem; text-wrap: balance; }
   h2 { font-size: 1.15rem; margin: 2.5rem 0 .5rem; }
   h3 { font-size: 1rem; margin: 1.5rem 0 .35rem; }
+  h4 { font-size: .95rem; margin: 1.25rem 0 .3rem; }
   p { margin: .5rem 0 1rem; }
   .lead { font-size: 1.15rem; color: var(--muted); max-width: 40rem; }
   a { color: var(--accent); }
@@ -107,27 +108,56 @@
   <p>E quando algo dá errado, as mensagens explicam <em>o que fazer</em>, em português — nada de erro técnico cru.</p>
 
   <h2>Manual: comece a usar</h2>
+  <p>
+    Nunca mexeu com terminal? Sem problema. O passo a passo abaixo foi escrito para quem <strong>não programa</strong>:
+    é só copiar e colar os comandos. Você faz esta configuração <strong>uma única vez</strong>; depois, é só conversar com o Claude.
+  </p>
 
-  <h3>Antes de tudo (uma vez): o projeto no Google Cloud</h3>
+  <h3>Antes de começar (o que você precisa ter)</h3>
+  <ul>
+    <li><strong>Node.js 18 ou mais novo</strong> — é o programa que faz o servidor rodar; os comandos <code>npm</code> e <code>npx</code> vêm junto. Para conferir, abra o terminal e digite <code>node --version</code>. Se não tiver, baixe a versão <strong>LTS</strong> em <a href="https://nodejs.org">nodejs.org</a>.</li>
+    <li><strong>O Claude Code instalado</strong> — é por ele que você conversa com o servidor (<a href="https://code.claude.com/docs">code.claude.com/docs</a>).</li>
+    <li><strong>Uma conta Google</strong>, a mesma em que os formulários vão aparecer.</li>
+  </ul>
+  <p><strong>Como abrir o terminal:</strong> no <strong>Windows</strong>, menu Iniciar → digite <em>PowerShell</em> → abra o Windows PowerShell. No <strong>Mac</strong>, <code>Cmd + Espaço</code> → <em>Terminal</em>. No <strong>Linux</strong>, procure por <em>Terminal</em> (ou <code>Ctrl + Alt + T</code>).</p>
+
+  <h3>Passo 1 — Preparar o Google Cloud (uma vez)</h3>
+  <p>Isto autoriza o servidor a falar com o Google Forms <strong>em seu nome</strong>. Acesse <a href="https://console.cloud.google.com">console.cloud.google.com</a> e faça login.</p>
   <ol>
-    <li>Em <a href="https://console.cloud.google.com">console.cloud.google.com</a>, crie um projeto e ative a <strong>Google Forms API</strong>.</li>
-    <li>Crie credenciais OAuth do tipo <strong>“App para computador”</strong> e baixe o arquivo <code>client_secret*.json</code>.</li>
+    <li><strong>Crie um projeto.</strong> No topo, clique no seletor de projetos → <strong>Novo projeto</strong> → dê um nome → <strong>Criar</strong>.</li>
+    <li><strong>Ative a Google Forms API.</strong> Na busca do topo, procure por <strong>Google Forms API</strong>, abra e clique em <strong>Ativar</strong>.</li>
+    <li><strong>Configure a tela de permissão.</strong> Menu → <strong>APIs e serviços</strong> → <strong>Tela de permissão OAuth</strong> → tipo <strong>Externo</strong> → preencha o nome do app e os e-mails de contato (podem ser os seus).</li>
+    <li><strong>Adicione-se como usuário de teste</strong> — o passo que mais gente esquece. Na Tela de permissão, em <strong>Usuários de teste</strong>, clique em <strong>Adicionar usuários</strong> e coloque o seu próprio e-mail do Google. Sem isso, o Google recusa a autorização com “acesso negado”.</li>
+    <li><strong>Crie a credencial.</strong> Menu → <strong>APIs e serviços</strong> → <strong>Credenciais</strong> → <strong>Criar credenciais</strong> → <strong>ID do cliente OAuth</strong> → tipo <strong>App para computador</strong> → <strong>Criar</strong>.</li>
+    <li><strong>Baixe o arquivo.</strong> Clique em <strong>Fazer download do JSON</strong>. Esse é o seu <code>client_secret*.json</code>.</li>
   </ol>
 
-  <h3>Caminho A — via npm (recomendado)</h3>
+  <h3>Passo 2 — Instalar e autorizar</h3>
+  <p>Escolha <strong>um</strong> dos dois caminhos. O <strong>Caminho A</strong> é o mais simples e não exige baixar o código.</p>
+
+  <h4>Caminho A — via npm (recomendado, sem clonar nada)</h4>
   <ol>
-    <li>Coloque o <code>client_secret*.json</code> na pasta <code>~/.config/mcp-server-google-forms/</code> (crie-a se não existir).</li>
-    <li>Autorize com o Google: <code>npx -p mcp-server-google-forms mcp-server-google-forms-token</code></li>
-    <li>Registre no Claude Code: <code>claude mcp add google-forms -- npx mcp-server-google-forms</code></li>
+    <li><strong>Rode o comando de autorização uma primeira vez.</strong> Ele vai falhar de propósito, mas já cria a pasta certa e mostra o caminho dela: <code>npx -p mcp-server-google-forms mcp-server-google-forms-token</code>. Vai aparecer algo como <em>“Não encontrei nenhum 'client_secret*.json' em …/.config/mcp-server-google-forms”</em>. Copie esse caminho.</li>
+    <li><strong>Coloque o <code>client_secret*.json</code> naquela pasta.</strong> Ela é oculta, então use o atalho de “ir para a pasta”: no <strong>Windows</strong>, no Explorer, cole na barra de endereço <code>%USERPROFILE%\.config\mcp-server-google-forms</code> e dê Enter. No <strong>Mac</strong>, no Finder, <code>Cmd + Shift + G</code> e cole <code>~/.config/mcp-server-google-forms</code>. No <strong>Linux</strong>, <code>Ctrl + L</code> e cole o mesmo caminho.</li>
+    <li><strong>Rode o mesmo comando de novo</strong> — agora o navegador abre. Escolha sua conta; na tela <strong>“O Google não verificou este app”</strong> (normal, pois o app é seu), clique em <strong>Avançado</strong> → <strong>Acessar … (não seguro)</strong> e confirme as permissões. No terminal aparece <em>“Pronto. refreshToken salvo…”</em>.</li>
+    <li><strong>Registre no Claude Code:</strong> <code>claude mcp add google-forms -- npx mcp-server-google-forms</code></li>
   </ol>
 
-  <h3>Caminho B — via clone do repositório</h3>
+  <div class="cite">
+    <p style="margin-top:0"><strong>Por que a pasta fica “oculta”?</strong> O caminho começa com um ponto (<code>.config</code>) e, por isso, a pasta não aparece por padrão no Explorer (Windows) nem no Finder (Mac). Isso é intencional.</p>
+    <p>Programas costumam guardar suas configurações — preferências, credenciais, chaves de acesso — em uma pasta reservada, para não espalhar arquivos pela sua pasta de usuário. Por convenção, essas pastas ficam agrupadas em <code>~/.config</code> (o <code>~</code> representa a sua pasta de usuário), e o ponto no início do nome faz o sistema não exibi-las na navegação normal. No Windows, o caminho equivalente é <code>C:\Users\SeuNome\.config\mcp-server-google-forms</code>, e essa pasta também fica oculta por padrão.</p>
+    <p style="margin-bottom:0">“Oculta” não significa “protegida”: a pasta é sua e pode ser aberta a qualquer momento — foi o que fizemos ao colar o caminho na barra de endereço. O ponto apenas evita que ela apareça junto dos seus documentos. É o local padrão onde ferramentas de linha de comando esperam encontrar esse tipo de arquivo, e por isso o servidor guarda ali o seu <code>client_secret.json</code> e a autorização.</p>
+  </div>
+
+  <h4>Caminho B — via clone do repositório (para quem for mexer no código)</h4>
   <ol>
     <li>Clone o <a href="https://github.com/claude-book/mcp-server-google-forms">repositório</a> e rode <code>npm install</code>.</li>
-    <li>Coloque o <code>client_secret*.json</code> na pasta <code>credentials/</code>.</li>
-    <li>Rode <code>npm run token</code> e autorize no navegador.</li>
+    <li>Coloque o <code>client_secret*.json</code> na pasta <code>credentials/</code> dentro do projeto (crie-a se não existir).</li>
+    <li>Rode <code>npm run token</code> e autorize no navegador (mesma tela do Google descrita no Caminho A, incluindo o aviso de “app não verificado”).</li>
     <li>Registre no Claude Code: <code>claude mcp add google-forms -- node "$(pwd)/src/server.js"</code></li>
   </ol>
+
+  <h3>Passo 3 — Peça ao Claude</h3>
   <p>Pronto: peça ao Claude, por exemplo, <em>“crie um quiz de 5 perguntas sobre fotossíntese, valendo 2 pontos cada, e me dê o link”</em>. O passo a passo completo, com solução de problemas, está no <a href="https://github.com/claude-book/mcp-server-google-forms#readme">README</a>.</p>
 
   <h2>Para citar em trabalhos acadêmicos</h2>
