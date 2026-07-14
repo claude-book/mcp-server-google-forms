@@ -40,7 +40,7 @@
     <li><strong>Configure a tela de permissão.</strong><br>Menu → <strong>APIs e serviços</strong> → <strong>Tela de permissão OAuth</strong> → tipo <strong>Externo</strong> → preencha o nome do app e os e-mails de contato (podem ser os seus).</li>
     <li><strong>Adicione-se como usuário de teste</strong> — o passo que mais gente esquece.<br>Na Tela de permissão, em <strong>Usuários de teste</strong>, clique em <strong>Adicionar usuários</strong> e coloque o seu próprio e-mail do Google. Sem isso, o Google recusa a autorização com “acesso negado”.</li>
     <li><strong>Crie a credencial.</strong><br>Menu → <strong>APIs e serviços</strong> → <strong>Credenciais</strong> → <strong>Criar credenciais</strong> → <strong>ID do cliente OAuth</strong> → tipo <strong>App para computador</strong> → <strong>Criar</strong>.</li>
-    <li><strong>Baixe o arquivo.</strong><br>Clique em <strong>Fazer download do JSON</strong>. Esse é o seu <code>client_secret*.json</code>.</li>
+    <li><strong>Baixe o arquivo.</strong><br>Clique em <strong>Fazer download do JSON</strong>. Esse é o seu <code>client_secret*.json</code>. <strong>Guarde-o bem:</strong> por segurança, o Google <strong>não deixa baixá-lo de novo</strong> depois — se perder, você terá de criar um cliente novo. (Mais sobre isso em <a href="#outro-computador">Usar em outro computador</a>.)</li>
   </ol>
 
   <h2>Passo 2 — Instalar e autorizar pelo npm</h2>
@@ -74,11 +74,39 @@
   <h2>Passo 3 — Peça ao Claude</h2>
   <p>Pronto: peça ao Claude, por exemplo, <em>“crie um quiz de 5 perguntas sobre fotossíntese, valendo 2 pontos cada, e me dê o link”</em>.</p>
 
+  <h2 id="duradoura">A autorização expira? Como deixar duradoura</h2>
+  <p>Enquanto o seu app no Google Cloud estiver em modo <strong>Testing</strong> (o padrão de fábrica), o Google <strong>expira a autorização a cada 7 dias</strong>. Quando isso acontece, o Claude para de criar formulários e aparece o erro <em>“credenciais expiradas ou revogadas”</em>.</p>
+
+  <div class="callout">
+    <p><strong>Solução definitiva (recomendada): publique o app — leva 30 segundos.</strong></p>
+    <ol>
+      <li>No Google Cloud, vá em <strong>APIs e serviços → Tela de permissão OAuth</strong> (na interface nova: <strong>Google Auth Platform → Público</strong>).</li>
+      <li>Em <strong>Status da publicação</strong>, clique em <strong>Publicar app</strong> (muda de <em>Testing</em> para <em>Em produção</em>) e confirme.</li>
+    </ol>
+    <p>A partir daí a autorização <strong>não expira mais</strong> a cada 7 dias. Você vai continuar vendo o aviso de <em>“app não verificado”</em> na hora de autorizar — é normal e inofensivo, e <strong>não</strong> é preciso passar pela verificação do Google para uso pessoal.</p>
+  </div>
+
+  <p><strong>Solução rápida (se expirar antes de você publicar):</strong> reautorize — rode o comando de autorização de novo e refaça o login no navegador:</p>
+  <p><code>npx -p mcp-server-google-forms mcp-server-google-forms-token</code></p>
+  <p>O servidor recarrega as credenciais sozinho, sem precisar reiniciar nada.</p>
+
+  <h2 id="outro-computador">Usar em outro computador</h2>
+  <p>A configuração do Google Cloud (Passo 1) é feita <strong>uma vez só</strong> e vale para qualquer máquina. O que fica preso a um computador é a autorização gravada em disco. No computador novo, escolha um dos dois caminhos:</p>
+  <ul>
+    <li><strong>Copiar a pasta de credenciais (mais fácil, sem reautorizar).</strong><br>Copie a pasta <code>~/.config/mcp-server-google-forms/</code> (no Windows, <code>C:\Users\SeuNome\.config\mcp-server-google-forms\</code>) — com os arquivos <code>client_secret*.json</code> e <code>config.json</code> — do computador antigo para o mesmo lugar no novo. Como o <code>config.json</code> guarda a autorização, nem precisa abrir o navegador de novo.</li>
+    <li><strong>Reautorizar.</strong><br>Coloque o <code>client_secret*.json</code> na pasta de credenciais do computador novo e rode o comando de autorização: <code>npx -p mcp-server-google-forms mcp-server-google-forms-token</code>.</li>
+  </ul>
+  <p>Em qualquer caso, registre o servidor na máquina nova com <code>claude mcp add google-forms -- npx mcp-server-google-forms</code>.</p>
+
+  <div class="callout">
+    <p>⚠️ <strong>Pegadinha do Google:</strong> depois que o cliente OAuth é criado, o Google <strong>não deixa mais baixar o <code>client_secret*.json</code></strong> nem ver o segredo de novo (a tela do cliente diz <em>“Viewing and downloading client secrets is no longer available”</em>). Por isso, <strong>guarde bem esse arquivo</strong> — ou simplesmente copie a pasta de credenciais, como acima. Se você o perdeu, crie um <strong>cliente novo</strong> (tipo “App para computador”) e baixe o JSON <strong>na hora da criação</strong>, que é o único momento em que o download aparece.</p>
+  </div>
+
   <h2>Solução de problemas</h2>
   <ul>
     <li><strong>“O Google não verificou este app”</strong> (tela laranja durante a autorização) — é esperado enquanto o seu app OAuth está em modo <strong>Testing</strong>. Clique em <strong>Avançado</strong> → <strong>Acessar … (não seguro)</strong>. É o seu próprio app; não há risco.</li>
     <li><strong>“Acesso negado” / <code>access_denied</code> ao autorizar</strong> — quase sempre é porque você não se adicionou como <strong>usuário de teste</strong> (Passo 1.4). Volte à Tela de permissão OAuth, adicione o seu e-mail e tente de novo.</li>
-    <li><strong>“Credenciais expiradas ou revogadas”</strong> — rode o comando de autorização de novo e repita; o servidor recarrega as credenciais sozinho. Em modo <strong>Testing</strong>, o Google expira a autorização a cada <strong>7 dias</strong>; para tokens duradouros, publique o app (Tela de permissão OAuth → <strong>In production</strong>).</li>
+    <li><strong>“Credenciais expiradas ou revogadas”</strong> — a autorização em modo <strong>Testing</strong> expira a cada 7 dias. Veja <a href="#duradoura">A autorização expira? Como deixar duradoura</a>: publique o app para resolver de vez, ou rode o comando de autorização de novo para renovar.</li>
   </ul>
   <p>O passo a passo completo, com todos os detalhes, também está no <a href="https://github.com/claude-book/mcp-server-google-forms#readme">README do projeto</a>.</p>
 
