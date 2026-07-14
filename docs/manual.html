@@ -27,6 +27,10 @@
   </ul>
   <p><strong>Como abrir o terminal:</strong> no <strong>Windows</strong>, menu Iniciar → digite <em>PowerShell</em> → abra o Windows PowerShell. No <strong>Mac</strong>, <code>Cmd + Espaço</code> → <em>Terminal</em>. No <strong>Linux</strong>, procure por <em>Terminal</em> (ou <code>Ctrl + Alt + T</code>).</p>
 
+  <div class="callout">
+    <p>💡 <strong>Neste guia, "rode o comando <em>X</em>" significa sempre:</strong> abra o terminal, cole o <em>X</em> e aperte <strong>Enter</strong>. Você vai repetir isso algumas vezes.</p>
+  </div>
+
   <h2>Passo 1 — Preparar o Google Cloud (uma vez)</h2>
   <p>Isto autoriza o servidor a falar com o Google Forms <strong>em seu nome</strong>. Acesse <a href="https://console.cloud.google.com">console.cloud.google.com</a> e faça login.</p>
   <ol>
@@ -43,7 +47,9 @@
 
   <h3>Caminho A — via npm (recomendado, sem clonar nada)</h3>
   <ol>
-    <li><strong>Rode o comando de autorização uma primeira vez.</strong> Ele vai falhar de propósito, mas já cria a pasta certa e mostra o caminho dela: <code>npx -p mcp-server-google-forms mcp-server-google-forms-token</code>. Vai aparecer algo como <em>“Não encontrei nenhum 'client_secret*.json' em …/.config/mcp-server-google-forms”</em>. Copie esse caminho.</li>
+    <li><strong>Rode o comando de autorização pela primeira vez.</strong> "Rodar um comando" quer dizer: abra o terminal (como mostramos acima), cole a linha abaixo e aperte <strong>Enter</strong>.
+      <br><code>npx -p mcp-server-google-forms mcp-server-google-forms-token</code>
+      <br>Nesta primeira vez ele vai falhar <strong>de propósito</strong> — e tudo bem: serve só para criar a pasta certa e mostrar o caminho dela. Vai aparecer algo como <em>“Não encontrei nenhum 'client_secret*.json' em …/.config/mcp-server-google-forms”</em>. <strong>Copie esse caminho.</strong></li>
     <li><strong>Coloque o <code>client_secret*.json</code> naquela pasta.</strong> Ela é oculta, então use o atalho de “ir para a pasta”: no <strong>Windows</strong>, no Explorer, cole na barra de endereço <code>%USERPROFILE%\.config\mcp-server-google-forms</code> e dê Enter. No <strong>Mac</strong>, no Finder, <code>Cmd + Shift + G</code> e cole <code>~/.config/mcp-server-google-forms</code>. No <strong>Linux</strong>, <code>Ctrl + L</code> e cole o mesmo caminho.</li>
     <li><strong>Rode o mesmo comando de novo</strong> — agora o navegador abre. Escolha sua conta; na tela <strong>“O Google não verificou este app”</strong> (normal, pois o app é seu), clique em <strong>Avançado</strong> → <strong>Acessar … (não seguro)</strong> e confirme as permissões. No terminal aparece <em>“Pronto. refreshToken salvo…”</em>.</li>
     <li><strong>Registre no Claude Code:</strong> <code>claude mcp add google-forms -- npx mcp-server-google-forms</code></li>
