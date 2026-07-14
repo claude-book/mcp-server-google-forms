@@ -1,37 +1,24 @@
 /* Estilo compartilhado por todas as páginas do site.
+   Paleta editorial clara, inspirada em henriquealvarenga.com/entrevista.
    As cores ficam nas variáveis abaixo — mude aqui para mudar em todas as páginas. */
 
 :root {
-  --bg: #faf9fc;
-  --surface: #ffffff;
-  --ink: #26212e;
-  --muted: #6b6477;
-  --accent: #6d3fc0;
-  --line: #e6e1ee;
-  --shadow: 0 1px 2px rgba(38, 33, 46, .06), 0 8px 24px rgba(38, 33, 46, .08);
-  --shadow-hover: 0 2px 4px rgba(38, 33, 46, .08), 0 16px 40px rgba(38, 33, 46, .16);
+  --bg: #f9f9f7;        /* fundo (off-white / "paper") */
+  --surface: #ffffff;   /* superfície de cards e blocos */
+  --ink: #1a1a1a;       /* títulos e texto forte */
+  --body: #333333;      /* texto corrido */
+  --muted: #6f6f6a;     /* texto secundário / apagado */
+  --accent: #b45309;    /* cor da marca (âmbar/terracota) */
+  --accent-dark: #92400e; /* hover dos links */
+  --line: #e5e5e0;      /* bordas */
+  --code-bg: #f4efe8;   /* fundo de trechos de código */
+  --shadow: 0 1px 2px rgba(26, 26, 26, .05), 0 8px 24px rgba(26, 26, 26, .07);
+  --shadow-hover: 0 2px 4px rgba(26, 26, 26, .07), 0 16px 40px rgba(26, 26, 26, .13);
 
   /* Cor de cada card (também usada como cor da página correspondente) */
-  --c-sobre: #7c3aed;   /* roxo   */
-  --c-manual: #0d9488;  /* verde-azulado */
-  --c-rapido: #ea580c;  /* laranja */
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #17141c;
-    --surface: #201c27;
-    --ink: #eae6f2;
-    --muted: #a49bb3;
-    --accent: #a583e8;
-    --line: #332d3e;
-    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .35);
-    --shadow-hover: 0 2px 4px rgba(0, 0, 0, .35), 0 16px 40px rgba(0, 0, 0, .5);
-
-    --c-sobre: #a78bfa;
-    --c-manual: #2dd4bf;
-    --c-rapido: #fb923c;
-  }
+  --c-sobre: #166534;   /* verde   */
+  --c-manual: #b45309;  /* âmbar (marca) */
+  --c-rapido: #991b1b;  /* vermelho */
 }
 
 * { box-sizing: border-box; }
@@ -39,7 +26,7 @@
 body {
   margin: 0;
   background: var(--bg);
-  color: var(--ink);
+  color: var(--body);
   font: 17px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
@@ -50,6 +37,7 @@ body {
   color: var(--accent); font-weight: 700; margin: 0 0 .75rem;
 }
 
+h1, h2, h3, h4 { color: var(--ink); }
 h1 { font-size: 2.1rem; line-height: 1.15; margin: 0 0 .75rem; text-wrap: balance; }
 h2 { font-size: 1.2rem; margin: 2.5rem 0 .5rem; }
 h3 { font-size: 1rem; margin: 1.6rem 0 .35rem; }
@@ -59,6 +47,7 @@ p { margin: .5rem 0 1rem; }
 .lead { font-size: 1.18rem; color: var(--muted); max-width: 40rem; }
 
 a { color: var(--accent); }
+a:hover { color: var(--accent-dark); }
 a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
 
 ol, ul { padding-left: 1.3rem; }
@@ -66,18 +55,14 @@ li { margin: .4rem 0; }
 
 code {
   font: .88em ui-monospace, "SF Mono", Menlo, monospace;
-  background: var(--surface); border: 1px solid var(--line);
+  background: var(--code-bg); border: 1px solid var(--line);
   border-radius: 5px; padding: .1em .35em;
   overflow-wrap: anywhere;
 }
 
-/* ---- Home: título com gradiente ---- */
+/* ---- Home: título ---- */
 .hero { text-align: center; }
-.hero h1 {
-  background: linear-gradient(100deg, var(--c-sobre), var(--c-manual) 55%, var(--c-rapido));
-  -webkit-background-clip: text; background-clip: text;
-  -webkit-text-fill-color: transparent; color: var(--c-sobre);
-}
+.hero h1 { color: var(--ink); }
 .hero .lead { margin-left: auto; margin-right: auto; }
 
 /* ---- Cards ---- */
@@ -106,7 +91,7 @@ code {
   display: inline-flex; align-items: center; justify-content: center;
   width: 3rem; height: 3rem; border-radius: 12px;
   font-size: 1.5rem; margin-bottom: .35rem;
-  background: color-mix(in srgb, var(--card, var(--accent)) 15%, transparent);
+  background: color-mix(in srgb, var(--card, var(--accent)) 13%, transparent);
 }
 .card__title { font-size: 1.15rem; font-weight: 700; color: var(--ink); }
 .card__desc { color: var(--muted); font-size: .96rem; flex: 1; }
@@ -150,6 +135,7 @@ code {
   font-size: .92rem; font-weight: 600;
 }
 .links a.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.links a.primary:hover { background: var(--accent-dark); border-color: var(--accent-dark); }
 
 /* ---- Caixa de destaque / citação ---- */
 .cite, .callout {

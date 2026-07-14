@@ -48,9 +48,7 @@
   </ol>
 
   <h2>Passo 2 — Instalar e autorizar</h2>
-  <p>Escolha <strong>um</strong> dos dois caminhos. O <strong>Caminho A</strong> é o mais simples e não exige baixar o código.</p>
-
-  <h3>Caminho A — via npm (recomendado)</h3>
+  <p>Direto pelo <strong>npm</strong>, sem clonar nada:</p>
   <ol>
     <li><strong>Rode o comando de autorização pela primeira vez.</strong><br>"Rodar um comando" quer dizer: abra o terminal (como mostramos acima), cole a linha abaixo e aperte <strong>Enter</strong>.
       <br><code>npx -p mcp-server-google-forms mcp-server-google-forms-token</code>
@@ -77,14 +75,6 @@
     <p>Programas costumam guardar suas configurações — preferências, credenciais, chaves de acesso — em uma pasta reservada, para não espalhar arquivos pela sua pasta de usuário. Por convenção, essas pastas ficam agrupadas em <code>~/.config</code> (o <code>~</code> representa a sua pasta de usuário), e o ponto no início do nome faz o sistema não exibi-las na navegação normal. No Windows, o caminho equivalente é <code>C:\Users\SeuNome\.config\mcp-server-google-forms</code>, e essa pasta também fica oculta por padrão.</p>
     <p>“Oculta” não significa “protegida”: a pasta é sua e pode ser aberta a qualquer momento — foi o que fizemos ao colar o caminho na barra de endereço. O ponto apenas evita que ela apareça junto dos seus documentos. É o local padrão onde ferramentas de linha de comando esperam encontrar esse tipo de arquivo, e por isso o servidor guarda ali o seu <code>client_secret.json</code> e a autorização.</p>
   </div>
-
-  <h3>Caminho B — via clone do repositório (para quem for mexer no código)</h3>
-  <ol>
-    <li>Clone o <a href="https://github.com/claude-book/mcp-server-google-forms">repositório</a> e rode <code>npm install</code>.</li>
-    <li>Coloque o <code>client_secret*.json</code> na pasta <code>credentials/</code> dentro do projeto (crie-a se não existir).</li>
-    <li>Rode <code>npm run token</code> e autorize no navegador (mesma tela do Google descrita no Caminho A, incluindo o aviso de “app não verificado”).</li>
-    <li>Registre no Claude Code: <code>claude mcp add google-forms -- node "$(pwd)/src/server.js"</code></li>
-  </ol>
 
   <h2>Passo 3 — Peça ao Claude</h2>
   <p>Pronto: peça ao Claude, por exemplo, <em>“crie um quiz de 5 perguntas sobre fotossíntese, valendo 2 pontos cada, e me dê o link”</em>.</p>
