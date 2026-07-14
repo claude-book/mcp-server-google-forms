@@ -103,6 +103,21 @@ Escolha **um** dos dois caminhos. O **Caminho A** é o mais simples e não exige
    claude mcp add google-forms -- npx mcp-server-google-forms
    ```
 
+> **Por que a pasta fica "oculta"?**
+> O caminho começa com um ponto (`.config`) e, por isso, a pasta não aparece por padrão no Explorer (Windows)
+> nem no Finder (Mac). Isso é intencional.
+>
+> Programas costumam guardar suas configurações — preferências, credenciais, chaves de acesso — em uma pasta
+> reservada, para não espalhar arquivos pela sua pasta de usuário. Por convenção, essas pastas ficam agrupadas
+> em `~/.config` (o `~` representa a sua pasta de usuário), e o ponto no início do nome faz o sistema não exibi-las
+> na navegação normal. No Windows, o caminho equivalente é `C:\Users\SeuNome\.config\mcp-server-google-forms`,
+> e essa pasta também fica oculta por padrão.
+>
+> "Oculta" não significa "protegida": a pasta é sua e pode ser aberta a qualquer momento — foi o que fizemos ao
+> colar o caminho na barra de endereço. O ponto apenas evita que ela apareça junto dos seus documentos. É o local
+> padrão onde ferramentas de linha de comando esperam encontrar esse tipo de arquivo, e por isso o servidor guarda
+> ali o seu `client_secret.json` e a autorização.
+
 ### Caminho B — via clone do repositório (para quem for mexer no código)
 
 1. **Clone e instale:**
