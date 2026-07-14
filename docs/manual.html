@@ -39,12 +39,12 @@
   <h2>Passo 1 — Preparar o Google Cloud (uma vez)</h2>
   <p>Isto autoriza o servidor a falar com o Google Forms <strong>em seu nome</strong>. Acesse <a href="https://console.cloud.google.com">console.cloud.google.com</a> e faça login.</p>
   <ol>
-    <li><strong>Crie um projeto.</strong> No topo, clique no seletor de projetos → <strong>Novo projeto</strong> → dê um nome → <strong>Criar</strong>.</li>
-    <li><strong>Ative a Google Forms API.</strong> Na busca do topo, procure por <strong>Google Forms API</strong>, abra e clique em <strong>Ativar</strong>.</li>
-    <li><strong>Configure a tela de permissão.</strong> Menu → <strong>APIs e serviços</strong> → <strong>Tela de permissão OAuth</strong> → tipo <strong>Externo</strong> → preencha o nome do app e os e-mails de contato (podem ser os seus).</li>
-    <li><strong>Adicione-se como usuário de teste</strong> — o passo que mais gente esquece. Na Tela de permissão, em <strong>Usuários de teste</strong>, clique em <strong>Adicionar usuários</strong> e coloque o seu próprio e-mail do Google. Sem isso, o Google recusa a autorização com “acesso negado”.</li>
-    <li><strong>Crie a credencial.</strong> Menu → <strong>APIs e serviços</strong> → <strong>Credenciais</strong> → <strong>Criar credenciais</strong> → <strong>ID do cliente OAuth</strong> → tipo <strong>App para computador</strong> → <strong>Criar</strong>.</li>
-    <li><strong>Baixe o arquivo.</strong> Clique em <strong>Fazer download do JSON</strong>. Esse é o seu <code>client_secret*.json</code>.</li>
+    <li><strong>Crie um projeto.</strong><br>No topo, clique no seletor de projetos → <strong>Novo projeto</strong> → dê um nome → <strong>Criar</strong>.</li>
+    <li><strong>Ative a Google Forms API.</strong><br>Na busca do topo, procure por <strong>Google Forms API</strong>, abra e clique em <strong>Ativar</strong>.</li>
+    <li><strong>Configure a tela de permissão.</strong><br>Menu → <strong>APIs e serviços</strong> → <strong>Tela de permissão OAuth</strong> → tipo <strong>Externo</strong> → preencha o nome do app e os e-mails de contato (podem ser os seus).</li>
+    <li><strong>Adicione-se como usuário de teste</strong> — o passo que mais gente esquece.<br>Na Tela de permissão, em <strong>Usuários de teste</strong>, clique em <strong>Adicionar usuários</strong> e coloque o seu próprio e-mail do Google. Sem isso, o Google recusa a autorização com “acesso negado”.</li>
+    <li><strong>Crie a credencial.</strong><br>Menu → <strong>APIs e serviços</strong> → <strong>Credenciais</strong> → <strong>Criar credenciais</strong> → <strong>ID do cliente OAuth</strong> → tipo <strong>App para computador</strong> → <strong>Criar</strong>.</li>
+    <li><strong>Baixe o arquivo.</strong><br>Clique em <strong>Fazer download do JSON</strong>. Esse é o seu <code>client_secret*.json</code>.</li>
   </ol>
 
   <h2>Passo 2 — Instalar e autorizar</h2>
@@ -69,7 +69,7 @@
         <li>Confirme as permissões. No terminal aparece <em>“Pronto. refreshToken salvo…”</em> — deu certo.</li>
       </ul>
     </li>
-    <li><strong>Registre no Claude Code:</strong> <code>claude mcp add google-forms -- npx mcp-server-google-forms</code></li>
+    <li><strong>Registre no Claude Code:</strong><br><code>claude mcp add google-forms -- npx mcp-server-google-forms</code></li>
   </ol>
 
   <div class="callout">
