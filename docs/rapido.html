@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Instalar rápido — mcp-server-google-forms</title>
+<link rel="stylesheet" href="styles.css">
+<style>:root { --page: var(--c-rapido); }</style>
+</head>
+<body>
+<div class="wrap page-accent">
+
+  <a class="back" href="index.html">← Início</a>
+
+  <p class="eyebrow">Instalar rápido</p>
+  <h1>Os 3 passos essenciais</h1>
+  <p class="lead">
+    Para quem já é da área e só quer os comandos. Precisa de contexto ou nunca mexeu com terminal?
+    Use o <a href="manual.html">Manual completo</a>.
+  </p>
+
+  <div class="callout" style="border-left-color:var(--c-rapido)">
+    <p><strong>Pré-requisitos:</strong> Node.js 18+, Claude Code instalado e um <code>client_secret*.json</code>
+    (OAuth do tipo “App para computador”) baixado do Google Cloud, com a <strong>Google Forms API</strong> ativada
+    e o seu e-mail adicionado como <strong>usuário de teste</strong> na tela de permissão.</p>
+  </div>
+
+  <ol>
+    <li>
+      <strong>Coloque o <code>client_secret*.json</code> na pasta de credenciais.</strong>
+      Dica: rode o comando do passo 2 uma vez — ele cria a pasta <code>~/.config/mcp-server-google-forms/</code>
+      sozinho e avisa que o arquivo falta. Aí é só soltar o JSON lá.
+    </li>
+    <li>
+      <strong>Autorize com o Google:</strong>
+      <br><code>npx -p mcp-server-google-forms mcp-server-google-forms-token</code>
+      <br>Aprove no navegador (em modo Testing, aceite o aviso de “app não verificado”).
+    </li>
+    <li>
+      <strong>Registre no Claude Code:</strong>
+      <br><code>claude mcp add google-forms -- npx mcp-server-google-forms</code>
+    </li>
+  </ol>
+
+  <h2>Prefere clonar o repositório?</h2>
+  <ol>
+    <li><code>git clone https://github.com/claude-book/mcp-server-google-forms.git &amp;&amp; cd mcp-server-google-forms &amp;&amp; npm install</code></li>
+    <li>Ponha o <code>client_secret*.json</code> em <code>credentials/</code> e rode <code>npm run token</code>.</li>
+    <li><code>claude mcp add google-forms -- node "$(pwd)/src/server.js"</code></li>
+  </ol>
+
+  <p style="margin-top:2rem">Depois é só pedir ao Claude, por exemplo: <em>“crie um quiz de 5 perguntas sobre fotossíntese, 2 pontos cada, e me dê o link”</em>.</p>
+
+  <footer>
+    <p>MIT © 2026 Henrique Alvarenga da Silva · contato: henriquealvarenga@gmail.com</p>
+    <nav>
+      <a href="index.html">Início</a>
+      <a href="sobre.html">Sobre o MCP</a>
+      <a href="manual.html">Manual completo</a>
+      <a href="https://github.com/claude-book/mcp-server-google-forms">GitHub</a>
+    </nav>
+  </footer>
+
+</div>
+</body>
+</html>
