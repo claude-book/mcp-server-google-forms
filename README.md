@@ -7,51 +7,58 @@
 Servidor MCP local que permite ao Claude Code **criar, editar e publicar Google Forms**.
 Código de exemplo do livro sobre Claude Code — instale pelo npm (ou clone), autorize com a sua conta Google e use.
 
-> **Nunca mexeu com terminal? Sem problema.** O passo a passo abaixo foi escrito para quem **não programa**:
-> é só copiar e colar os comandos. Você faz esta configuração **uma única vez**; depois, é só conversar com o Claude.
+> 🧑‍🏫 **Nunca mexeu com terminal?** O guia abaixo foi escrito para quem **não programa**: é só copiar e colar.
+> Você faz esta configuração **uma única vez**; depois, é só conversar com o Claude. Há também uma
+> [versão em página, com cards](https://claude-book.github.io/mcp-server-google-forms/) — talvez mais confortável de ler.
 
-## Ferramentas expostas
+## Índice
 
-- `create_form` — cria um formulário e devolve o ID e os links. Por padrão o Google o cria **já publicado**;
-  use `unpublished=true` para criar como rascunho. A resposta informa o estado real.
-- `build_form` — cria o formulário **inteiro numa única operação**: título, descrição, modo quiz e todas as perguntas.
-- `set_publish` — publica ou despublica o formulário (libera ou bloqueia respostas).
-- `get_form` — mostra a lista de itens com as posições e a estrutura completa.
-- `add_question` — acrescenta uma pergunta (no final ou numa posição indicada). Nove tipos: texto curto/longo,
-  escolha única, caixas de seleção, lista suspensa, escala linear, data, hora/duração e avaliação (estrelas, corações ou joinhas).
-- `update_form_info` — altera o título e/ou a descrição de um formulário existente.
-- `update_question` — edita uma pergunta existente (enunciado, obrigatoriedade, alternativas, pontos, gabarito)
-  sem apagar e recriar — preserva o vínculo com respostas já recebidas.
-- `set_quiz` — liga ou desliga o modo quiz (com notas). Obrigatório antes de usar `points`.
-- `add_section` — insere uma quebra de seção (nova página) na posição indicada.
-- `add_text_item` — insere um bloco de texto explicativo (sem campo de resposta) na posição indicada.
-- `delete_question` — remove a pergunta na posição indicada (recusa apagar o que não for pergunta).
-- `move_question` — move um item de uma posição para outra.
-- `list_responses` — lista as respostas, incluindo perguntas de upload de arquivo. Em páginas (padrão 50),
-  com `pageSize`/`pageToken` para formulários com muitas respostas.
-- `verify_answer_keys` — confere o gabarito de um quiz contra uma lista esperada (auditoria pós-criação).
-- `auth_status` — diagnóstico das credenciais: arquivo presente, campos completos e teste real com o Google.
+- [Início rápido](#início-rápido) — para quem já é da área
+- [Guia completo para quem não programa](#guia-completo-para-quem-não-programa)
+- [Ferramentas (15)](#ferramentas-15)
+- [Solução de problemas](#solução-de-problemas)
+- [Referência técnica](#referência-técnica)
+- [Documentação](#documentação)
+- [Citação](#citação) · [Licença](#licença)
 
 ---
 
-## Antes de começar (o que você precisa ter)
+## Início rápido
+
+Já tem Node.js 18+, o Claude Code e um `client_secret*.json` (OAuth "App para computador") do Google Cloud?
+Então são três passos:
+
+```bash
+# 1. Coloque o client_secret*.json em ~/.config/mcp-server-google-forms/
+#    (rode o comando abaixo uma vez e ele cria essa pasta sozinho)
+
+# 2. Autorize com o Google
+npx -p mcp-server-google-forms mcp-server-google-forms-token
+
+# 3. Registre no Claude Code
+claude mcp add google-forms -- npx mcp-server-google-forms
+```
+
+Nunca configurou o projeto no Google Cloud, ou quer o passo a passo detalhado? Siga o guia abaixo. 👇
+
+---
+
+## Guia completo para quem não programa
+
+### Antes de começar (o que você precisa ter)
 
 1. **Node.js 18 ou mais novo.** É o programa que faz o servidor rodar; os comandos `npm` e `npx` vêm junto com ele.
-   - Para conferir se já tem, abra o terminal (veja abaixo) e digite `node --version`. Se aparecer algo como
-     `v18.0.0` ou maior, está pronto. Se der "comando não encontrado", baixe a versão **LTS** em
-     [nodejs.org](https://nodejs.org) e instale (é só avançar/próximo).
-2. **O Claude Code instalado** — é por ele que você vai conversar com o servidor. Instruções em
-   [code.claude.com/docs](https://code.claude.com/docs).
+   Para conferir, abra o terminal (veja abaixo) e digite `node --version`. Se aparecer `v18…` ou maior, está pronto.
+   Se não, baixe a versão **LTS** em [nodejs.org](https://nodejs.org) e instale (é só avançar/próximo).
+2. **O Claude Code instalado** — é por ele que você conversa com o servidor ([code.claude.com/docs](https://code.claude.com/docs)).
 3. **Uma conta Google** (a mesma em que os formulários vão aparecer).
 
 **Como abrir o terminal** (é onde você cola os comandos):
-- **Mac:** aperte `Cmd + Espaço`, digite *Terminal* e dê Enter.
 - **Windows:** menu Iniciar → digite *PowerShell* → abra o **Windows PowerShell**.
+- **Mac:** aperte `Cmd + Espaço`, digite *Terminal* e dê Enter.
 - **Linux:** procure por *Terminal* no menu de aplicativos (ou `Ctrl + Alt + T`).
 
----
-
-## Passo 1 — Preparar o Google Cloud (uma vez)
+### Passo 1 — Preparar o Google Cloud (uma vez)
 
 Isto autoriza o servidor a falar com o Google Forms **em seu nome**. Parece longo, mas você faz só uma vez.
 Acesse [console.cloud.google.com](https://console.cloud.google.com) e faça login com a sua conta Google.
@@ -71,13 +78,9 @@ Acesse [console.cloud.google.com](https://console.cloud.google.com) e faça logi
 6. **Baixe o arquivo.** Na janela que aparece (ou no ícone de download ⬇ ao lado da credencial), clique em
    **Fazer download do JSON**. Esse é o seu `client_secret*.json`. Guarde-o — você vai usá-lo no Passo 2.
 
----
+### Passo 2 — Instalar e autorizar (Caminho A, recomendado)
 
-## Passo 2 — Instalar e autorizar
-
-Escolha **um** dos dois caminhos. O **Caminho A** é o mais simples e não exige baixar o código.
-
-### Caminho A — via npm (recomendado, sem clonar nada)
+Sem clonar nada, direto pelo npm:
 
 1. **Rode o comando de autorização uma primeira vez.** Ele ainda vai falhar de propósito — mas já cria a pasta
    certa e mostra o caminho dela. No terminal, cole:
@@ -87,8 +90,8 @@ Escolha **um** dos dois caminhos. O **Caminho A** é o mais simples e não exige
    Vai aparecer uma mensagem como *"Não encontrei nenhum 'client_secret*.json' em …/.config/mcp-server-google-forms"*.
    Anote (ou copie) esse caminho — é para lá que vai o arquivo.
 2. **Coloque o `client_secret*.json` naquela pasta.** Ela é oculta, então use o atalho de "ir para a pasta":
-   - **Mac:** no Finder, `Cmd + Shift + G`, cole `~/.config/mcp-server-google-forms` e dê Enter. Arraste o arquivo para lá.
    - **Windows:** no Explorer, clique na barra de endereço, cole `%USERPROFILE%\.config\mcp-server-google-forms` e dê Enter.
+   - **Mac:** no Finder, `Cmd + Shift + G`, cole `~/.config/mcp-server-google-forms` e dê Enter. Arraste o arquivo para lá.
    - **Linux:** no gerenciador de arquivos, `Ctrl + L`, cole `~/.config/mcp-server-google-forms` e dê Enter.
 3. **Rode o mesmo comando de novo.** Agora o navegador abre sozinho:
    ```
@@ -103,22 +106,27 @@ Escolha **um** dos dois caminhos. O **Caminho A** é o mais simples e não exige
    claude mcp add google-forms -- npx mcp-server-google-forms
    ```
 
-> **Por que a pasta fica "oculta"?**
-> O caminho começa com um ponto (`.config`) e, por isso, a pasta não aparece por padrão no Explorer (Windows)
-> nem no Finder (Mac). Isso é intencional.
->
-> Programas costumam guardar suas configurações — preferências, credenciais, chaves de acesso — em uma pasta
-> reservada, para não espalhar arquivos pela sua pasta de usuário. Por convenção, essas pastas ficam agrupadas
-> em `~/.config` (o `~` representa a sua pasta de usuário), e o ponto no início do nome faz o sistema não exibi-las
-> na navegação normal. No Windows, o caminho equivalente é `C:\Users\SeuNome\.config\mcp-server-google-forms`,
-> e essa pasta também fica oculta por padrão.
->
-> "Oculta" não significa "protegida": a pasta é sua e pode ser aberta a qualquer momento — foi o que fizemos ao
-> colar o caminho na barra de endereço. O ponto apenas evita que ela apareça junto dos seus documentos. É o local
-> padrão onde ferramentas de linha de comando esperam encontrar esse tipo de arquivo, e por isso o servidor guarda
-> ali o seu `client_secret.json` e a autorização.
+<details>
+<summary>🤔 <strong>Por que a pasta fica "oculta"?</strong></summary>
 
-### Caminho B — via clone do repositório (para quem for mexer no código)
+O caminho começa com um ponto (`.config`) e, por isso, a pasta não aparece por padrão no Explorer (Windows)
+nem no Finder (Mac). Isso é intencional.
+
+Programas costumam guardar suas configurações — preferências, credenciais, chaves de acesso — em uma pasta
+reservada, para não espalhar arquivos pela sua pasta de usuário. Por convenção, essas pastas ficam agrupadas
+em `~/.config` (o `~` representa a sua pasta de usuário), e o ponto no início do nome faz o sistema não exibi-las
+na navegação normal. No Windows, o caminho equivalente é `C:\Users\SeuNome\.config\mcp-server-google-forms`,
+e essa pasta também fica oculta por padrão.
+
+"Oculta" não significa "protegida": a pasta é sua e pode ser aberta a qualquer momento — foi o que fizemos ao
+colar o caminho na barra de endereço. O ponto apenas evita que ela apareça junto dos seus documentos. É o local
+padrão onde ferramentas de linha de comando esperam encontrar esse tipo de arquivo, e por isso o servidor guarda
+ali o seu `client_secret.json` e a autorização.
+
+</details>
+
+<details>
+<summary>💻 <strong>Caminho B — via clone do repositório</strong> (para quem for mexer no código)</summary>
 
 1. **Clone e instale:**
    ```
@@ -134,9 +142,9 @@ Escolha **um** dos dois caminhos. O **Caminho A** é o mais simples e não exige
    claude mcp add google-forms -- node "$(pwd)/src/server.js"
    ```
 
----
+</details>
 
-## Passo 3 — Peça ao Claude
+### Passo 3 — Peça ao Claude
 
 Pronto! Abra o Claude Code e peça em português, por exemplo:
 
@@ -150,22 +158,72 @@ Fluxo típico: `build_form` (ou `create_form` → `add_question`) → compartilh
 
 ---
 
+## Ferramentas (15)
+
+| Ferramenta | O que faz |
+| --- | --- |
+| `create_form` | Cria um formulário e devolve o ID e os links. Por padrão o Google o cria **já publicado**; use `unpublished=true` para rascunho. A resposta informa o estado real. |
+| `build_form` | Cria o formulário **inteiro numa única operação**: título, descrição, modo quiz e todas as perguntas. |
+| `set_publish` | Publica ou despublica o formulário (libera ou bloqueia respostas). |
+| `get_form` | Mostra a lista de itens com as posições e a estrutura completa. |
+| `add_question` | Acrescenta uma pergunta (no final ou numa posição). Nove tipos: texto curto/longo, escolha única, caixas de seleção, lista suspensa, escala linear, data, hora/duração e avaliação (estrelas, corações ou joinhas). |
+| `update_form_info` | Altera o título e/ou a descrição de um formulário existente. |
+| `update_question` | Edita uma pergunta existente (enunciado, obrigatoriedade, alternativas, pontos, gabarito) sem apagar e recriar — preserva o vínculo com respostas já recebidas. |
+| `set_quiz` | Liga ou desliga o modo quiz (com notas). Obrigatório antes de usar `points`. |
+| `add_section` | Insere uma quebra de seção (nova página) na posição indicada. |
+| `add_text_item` | Insere um bloco de texto explicativo (sem campo de resposta) na posição indicada. |
+| `delete_question` | Remove a pergunta na posição indicada (recusa apagar o que não for pergunta). |
+| `move_question` | Move um item de uma posição para outra. |
+| `list_responses` | Lista as respostas, incluindo perguntas de upload de arquivo. Em páginas (padrão 50), com `pageSize`/`pageToken`. |
+| `verify_answer_keys` | Confere o gabarito de um quiz contra uma lista esperada (auditoria pós-criação). |
+| `auth_status` | Diagnóstico das credenciais: arquivo presente, campos completos e teste real com o Google. |
+
+---
+
 ## Solução de problemas
 
-- **"O Google não verificou este app"** (tela laranja durante a autorização) — é esperado enquanto o seu app OAuth
-  está em modo **Testing**. Clique em **Avançado** → **Acessar … (não seguro)**. É o seu próprio app; não há risco.
-- **"Acesso negado" / `access_denied` ao autorizar** — quase sempre é porque você **não se adicionou como usuário de teste**
-  (Passo 1.4). Volte à Tela de permissão OAuth, adicione o seu e-mail em **Usuários de teste** e tente de novo.
-- **"Credenciais expiradas ou revogadas"** — rode o comando de autorização de novo (`npm run token` no clone, ou
-  `npx -p mcp-server-google-forms mcp-server-google-forms-token` no npm) e repita; o servidor recarrega as credenciais
-  sozinho, sem precisar reiniciar. Importante: enquanto o app OAuth estiver em modo **Testing** no Google Cloud, o Google
-  expira a autorização a cada **7 dias**. Para tokens duradouros, publique o app (Tela de permissão OAuth → **In production**).
-- **O Google não enviou o refresh token** — se a mensagem pedir, remova o acesso deste app em
-  [myaccount.google.com/permissions](https://myaccount.google.com/permissions) e rode a autorização mais uma vez.
+<details>
+<summary><strong>"O Google não verificou este app"</strong> (tela laranja durante a autorização)</summary>
+
+É esperado enquanto o seu app OAuth está em modo **Testing**. Clique em **Avançado** → **Acessar … (não seguro)**.
+É o seu próprio app; não há risco.
+
+</details>
+
+<details>
+<summary><strong>"Acesso negado" / <code>access_denied</code> ao autorizar</strong></summary>
+
+Quase sempre é porque você **não se adicionou como usuário de teste** (Passo 1.4). Volte à Tela de permissão OAuth,
+adicione o seu e-mail em **Usuários de teste** e tente de novo.
+
+</details>
+
+<details>
+<summary><strong>"Credenciais expiradas ou revogadas"</strong></summary>
+
+Rode o comando de autorização de novo (`npm run token` no clone, ou
+`npx -p mcp-server-google-forms mcp-server-google-forms-token` no npm) e repita; o servidor recarrega as credenciais
+sozinho, sem precisar reiniciar. Importante: enquanto o app OAuth estiver em modo **Testing** no Google Cloud, o Google
+expira a autorização a cada **7 dias**. Para tokens duradouros, publique o app (Tela de permissão OAuth → **In production**).
+
+</details>
+
+<details>
+<summary><strong>"O Google não enviou o refresh token"</strong></summary>
+
+Se a mensagem pedir, remova o acesso deste app em
+[myaccount.google.com/permissions](https://myaccount.google.com/permissions) e rode a autorização mais uma vez.
+
+</details>
 
 Para um diagnóstico rápido, peça ao Claude para rodar a ferramenta `auth_status`: ela testa as credenciais direto com o Google.
 
-## Estrutura da pasta
+---
+
+## Referência técnica
+
+<details>
+<summary><strong>Estrutura da pasta</strong></summary>
 
 ```
 src/server.js          → o servidor MCP
@@ -174,14 +232,10 @@ credentials/           → segredos locais (client_secret*.json e config.json) �
 docs/                  → revisão de código e histórico de alterações
 ```
 
-## Documentação
+</details>
 
-- [Página do projeto](https://claude-book.github.io/mcp-server-google-forms/) — apresentação, [política de privacidade](https://claude-book.github.io/mcp-server-google-forms/privacidade.html) e [termos de uso](https://claude-book.github.io/mcp-server-google-forms/termos.html).
-- [Revisão de código](docs/revisao-de-codigo.md) — problemas conhecidos, gravidade, status das correções e histórico de alterações com as razões de cada mudança.
-- [Estudo de MCPs similares](docs/estudo-de-mcps-similares.md) — comparação com 7 servidores MCP para Google Forms do GitHub, melhorias adotadas e anti-padrões a evitar.
-- [Versão em HTML](docs/revisao-de-codigo.html) — o mesmo relatório em formato amigável para não-programadores (abra no navegador).
-
-## Onde ficam as credenciais
+<details>
+<summary><strong>Onde ficam as credenciais</strong></summary>
 
 O servidor e o script de autorização procuram as credenciais nesta ordem:
 
@@ -189,11 +243,25 @@ O servidor e o script de autorização procuram as credenciais nesta ordem:
 2. Em `credentials/` dentro do projeto, se a pasta existir (instalação por clone);
 3. Em `~/.config/mcp-server-google-forms/` (instalação via npm/npx).
 
-## Arquivos sensíveis
+</details>
+
+<details>
+<summary><strong>Arquivos sensíveis</strong></summary>
 
 Tudo na pasta de credenciais guarda segredos — no caso do clone, a pasta `credentials/` inteira está no
 `.gitignore` e nunca deve ser commitada. O pacote npm é gerado só com `src/` e `scripts/` (campo `files`
 do `package.json`), então credenciais jamais entram no pacote.
+
+</details>
+
+---
+
+## Documentação
+
+- [Página do projeto](https://claude-book.github.io/mcp-server-google-forms/) — apresentação, [política de privacidade](https://claude-book.github.io/mcp-server-google-forms/privacidade.html) e [termos de uso](https://claude-book.github.io/mcp-server-google-forms/termos.html).
+- [Revisão de código](docs/revisao-de-codigo.md) — problemas conhecidos, gravidade, status das correções e histórico de alterações com as razões de cada mudança.
+- [Estudo de MCPs similares](docs/estudo-de-mcps-similares.md) — comparação com 7 servidores MCP para Google Forms do GitHub, melhorias adotadas e anti-padrões a evitar.
+- [Versão em HTML](docs/revisao-de-codigo.html) — o mesmo relatório em formato amigável para não-programadores (abra no navegador).
 
 ## Citação
 
