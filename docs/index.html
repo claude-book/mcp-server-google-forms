@@ -5,177 +5,72 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="google-site-verification" content="pu_2Wq16NT9dqk13OtvC4nM5osk3hQjnt8lJIogbZ7E" />
 <title>mcp-server-google-forms — Google Forms no Claude Code</title>
-<style>
-  :root {
-    --bg: #faf9fc; --surface: #ffffff; --ink: #26212e; --muted: #6b6477;
-    --accent: #6d3fc0; --line: #e6e1ee;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #17141c; --surface: #201c27; --ink: #eae6f2; --muted: #a49bb3;
-      --accent: #a583e8; --line: #332d3e;
-    }
-  }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0; background: var(--bg); color: var(--ink);
-    font: 17px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  }
-  .wrap { max-width: 46rem; margin: 0 auto; padding: 3.5rem 1.25rem 4rem; }
-  .eyebrow {
-    text-transform: uppercase; letter-spacing: .14em; font-size: .72rem;
-    color: var(--accent); font-weight: 700; margin: 0 0 .75rem;
-  }
-  h1 { font-size: 2rem; line-height: 1.2; margin: 0 0 .75rem; text-wrap: balance; }
-  h2 { font-size: 1.15rem; margin: 2.5rem 0 .5rem; }
-  h3 { font-size: 1rem; margin: 1.5rem 0 .35rem; }
-  h4 { font-size: .95rem; margin: 1.25rem 0 .3rem; }
-  p { margin: .5rem 0 1rem; }
-  .lead { font-size: 1.15rem; color: var(--muted); max-width: 40rem; }
-  a { color: var(--accent); }
-  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
-  .badges { display: flex; flex-wrap: wrap; gap: .5rem; margin: 1.25rem 0 0; }
-  .badges img { height: 22px; }
-  .links { display: flex; flex-wrap: wrap; gap: .6rem; margin: 1.25rem 0 0; padding: 0; list-style: none; }
-  .links a {
-    display: inline-block; padding: .45rem .9rem; border: 1px solid var(--line);
-    border-radius: 999px; background: var(--surface); text-decoration: none;
-    font-size: .92rem; font-weight: 600;
-  }
-  .links a.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
-  ol, ul { padding-left: 1.3rem; } li { margin: .35rem 0; }
-  code {
-    font: .88em ui-monospace, "SF Mono", Menlo, monospace;
-    background: var(--surface); border: 1px solid var(--line);
-    border-radius: 5px; padding: .1em .35em;
-    overflow-wrap: anywhere;
-  }
-  .cite {
-    background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--accent);
-    border-radius: 8px; padding: .9rem 1.1rem; font-size: .95rem;
-  }
-  footer { margin-top: 3.5rem; padding-top: 1.25rem; border-top: 1px solid var(--line); font-size: .88rem; color: var(--muted); }
-  footer nav { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: .35rem; }
-</style>
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
 <div class="wrap">
-  <p class="eyebrow">Código de exemplo do livro sobre Claude Code</p>
-  <h1>Crie e edite Google Forms conversando com o Claude</h1>
-  <p class="lead">
-    <strong>mcp-server-google-forms</strong> é um servidor MCP local, em Node.js, com
-    <strong>15 ferramentas</strong> para o Claude criar formulários completos numa única operação,
-    montar quizzes com gabarito, organizar seções, publicar e ler respostas — tudo pela conversa.
-  </p>
-  <p class="badges">
-    <a href="https://www.npmjs.com/package/mcp-server-google-forms"><img src="https://img.shields.io/npm/v/mcp-server-google-forms?label=npm&color=cb3837" alt="Versão publicada no npm"></a>
-    <a href="https://registry.modelcontextprotocol.io/?q=mcp-server-google-forms"><img src="https://img.shields.io/badge/MCP%20Registry-io.github.claude--book-6d3fc0" alt="Registrado no MCP Registry oficial"></a>
-    <a href="https://doi.org/10.5281/zenodo.21296975"><img src="https://zenodo.org/badge/1294358395.svg" alt="DOI no Zenodo"></a>
-  </p>
-  <ul class="links">
-    <li><a class="primary" href="https://github.com/claude-book/mcp-server-google-forms">Ver no GitHub</a></li>
-    <li><a href="https://www.npmjs.com/package/mcp-server-google-forms">Pacote no npm</a></li>
-    <li><a href="revisao-de-codigo.html">Revisão de código</a></li>
-    <li><a href="privacidade.html">Política de privacidade</a></li>
-    <li><a href="termos.html">Termos de uso</a></li>
+
+  <header class="hero">
+    <p class="eyebrow">Código de exemplo do livro sobre Claude Code</p>
+    <h1>Crie e edite Google Forms conversando com o Claude</h1>
+    <p class="lead">
+      Um servidor MCP que dá ao Claude o poder de montar formulários e quizzes completos,
+      publicar e ler respostas — tudo pela conversa, sem você precisar saber programar.
+    </p>
+    <p class="badges">
+      <a href="https://www.npmjs.com/package/mcp-server-google-forms"><img src="https://img.shields.io/npm/v/mcp-server-google-forms?label=npm&color=cb3837" alt="Versão publicada no npm"></a>
+      <a href="https://registry.modelcontextprotocol.io/?q=mcp-server-google-forms"><img src="https://img.shields.io/badge/MCP%20Registry-io.github.claude--book-6d3fc0" alt="Registrado no MCP Registry oficial"></a>
+      <a href="https://doi.org/10.5281/zenodo.21296975"><img src="https://zenodo.org/badge/1294358395.svg" alt="DOI no Zenodo"></a>
+    </p>
+  </header>
+
+  <ul class="cards">
+    <li>
+      <a class="card card--sobre" href="sobre.html">
+        <span class="card__icon">📄</span>
+        <span class="card__title">Sobre o MCP</span>
+        <span class="card__desc">O que é, como funciona e o que ele faz. Comece por aqui se ainda não entendeu a ideia.</span>
+        <span class="card__arrow">Entender →</span>
+      </a>
+    </li>
+    <li>
+      <a class="card card--manual" href="manual.html">
+        <span class="card__icon">🛠️</span>
+        <span class="card__title">Manual de instalação</span>
+        <span class="card__desc">Passo a passo para instalar e autorizar, escrito para quem nunca mexeu com terminal.</span>
+        <span class="card__arrow">Instalar →</span>
+      </a>
+    </li>
+    <li>
+      <a class="card card--rapido" href="rapido.html">
+        <span class="card__icon">⚡</span>
+        <span class="card__title">Instalar rápido</span>
+        <span class="card__desc">Já é da área e só quer os comandos? Os 3 passos essenciais, sem enrolação.</span>
+        <span class="card__arrow">Ver os comandos →</span>
+      </a>
+    </li>
   </ul>
 
-  <h2>Onde ele está publicado</h2>
-  <ul>
-    <li><strong>npm</strong> — instale com um comando, sem clonar nada: <a href="https://www.npmjs.com/package/mcp-server-google-forms">mcp-server-google-forms</a>.</li>
-    <li><strong>MCP Registry oficial</strong> (da Anthropic e da comunidade MCP) — registrado como <code>io.github.claude-book/mcp-server-google-forms</code>.</li>
-    <li><strong>Zenodo (CERN)</strong> — cada versão é arquivada com DOI permanente; citável em trabalhos acadêmicos.</li>
-  </ul>
-
-  <h2>Como funciona</h2>
-  <p>
-    O servidor roda <strong>no seu computador</strong> e conversa com a API oficial do Google Forms
-    usando uma autorização que só você concede — com os <strong>escopos mínimos</strong> (formulários e
-    leitura de respostas; nada de acesso ao Drive inteiro). Nenhum dado passa por servidores de
-    terceiros: é a sua máquina falando diretamente com o Google.
-  </p>
-
-  <h2>O que ele faz (15 ferramentas)</h2>
-  <ul>
-    <li><strong>Criar</strong> — <code>build_form</code> monta o formulário inteiro numa única operação (título, descrição, quiz e até 50 perguntas); <code>create_form</code> cria um vazio.</li>
-    <li><strong>Perguntar</strong> — <code>add_question</code> com 9 tipos: texto curto e longo, escolha única, caixas de seleção, lista suspensa, escala linear, data, hora/duração e avaliação (estrelas, corações, joinhas).</li>
-    <li><strong>Organizar</strong> — seções (<code>add_section</code>), blocos de texto (<code>add_text_item</code>), mover (<code>move_question</code>) e apagar (<code>delete_question</code>) com validação de posição.</li>
-    <li><strong>Editar sem recriar</strong> — <code>update_question</code> e <code>update_form_info</code> preservam o vínculo com respostas já recebidas.</li>
-    <li><strong>Quiz de verdade</strong> — pontos e gabarito por pergunta (<code>set_quiz</code>), com auditoria pós-criação (<code>verify_answer_keys</code>).</li>
-    <li><strong>Publicar e acompanhar</strong> — <code>set_publish</code>, <code>get_form</code> (resumo legível) e <code>list_responses</code> (paginada).</li>
-    <li><strong>Diagnóstico</strong> — <code>auth_status</code> testa as credenciais direto com o Google.</li>
-  </ul>
-  <p>E quando algo dá errado, as mensagens explicam <em>o que fazer</em>, em português — nada de erro técnico cru.</p>
-
-  <h2>Manual: comece a usar</h2>
-  <p>
-    Nunca mexeu com terminal? Sem problema. O passo a passo abaixo foi escrito para quem <strong>não programa</strong>:
-    é só copiar e colar os comandos. Você faz esta configuração <strong>uma única vez</strong>; depois, é só conversar com o Claude.
-  </p>
-
-  <h3>Antes de começar (o que você precisa ter)</h3>
-  <ul>
-    <li><strong>Node.js 18 ou mais novo</strong> — é o programa que faz o servidor rodar; os comandos <code>npm</code> e <code>npx</code> vêm junto. Para conferir, abra o terminal e digite <code>node --version</code>. Se não tiver, baixe a versão <strong>LTS</strong> em <a href="https://nodejs.org">nodejs.org</a>.</li>
-    <li><strong>O Claude Code instalado</strong> — é por ele que você conversa com o servidor (<a href="https://code.claude.com/docs">code.claude.com/docs</a>).</li>
-    <li><strong>Uma conta Google</strong>, a mesma em que os formulários vão aparecer.</li>
-  </ul>
-  <p><strong>Como abrir o terminal:</strong> no <strong>Windows</strong>, menu Iniciar → digite <em>PowerShell</em> → abra o Windows PowerShell. No <strong>Mac</strong>, <code>Cmd + Espaço</code> → <em>Terminal</em>. No <strong>Linux</strong>, procure por <em>Terminal</em> (ou <code>Ctrl + Alt + T</code>).</p>
-
-  <h3>Passo 1 — Preparar o Google Cloud (uma vez)</h3>
-  <p>Isto autoriza o servidor a falar com o Google Forms <strong>em seu nome</strong>. Acesse <a href="https://console.cloud.google.com">console.cloud.google.com</a> e faça login.</p>
-  <ol>
-    <li><strong>Crie um projeto.</strong> No topo, clique no seletor de projetos → <strong>Novo projeto</strong> → dê um nome → <strong>Criar</strong>.</li>
-    <li><strong>Ative a Google Forms API.</strong> Na busca do topo, procure por <strong>Google Forms API</strong>, abra e clique em <strong>Ativar</strong>.</li>
-    <li><strong>Configure a tela de permissão.</strong> Menu → <strong>APIs e serviços</strong> → <strong>Tela de permissão OAuth</strong> → tipo <strong>Externo</strong> → preencha o nome do app e os e-mails de contato (podem ser os seus).</li>
-    <li><strong>Adicione-se como usuário de teste</strong> — o passo que mais gente esquece. Na Tela de permissão, em <strong>Usuários de teste</strong>, clique em <strong>Adicionar usuários</strong> e coloque o seu próprio e-mail do Google. Sem isso, o Google recusa a autorização com “acesso negado”.</li>
-    <li><strong>Crie a credencial.</strong> Menu → <strong>APIs e serviços</strong> → <strong>Credenciais</strong> → <strong>Criar credenciais</strong> → <strong>ID do cliente OAuth</strong> → tipo <strong>App para computador</strong> → <strong>Criar</strong>.</li>
-    <li><strong>Baixe o arquivo.</strong> Clique em <strong>Fazer download do JSON</strong>. Esse é o seu <code>client_secret*.json</code>.</li>
-  </ol>
-
-  <h3>Passo 2 — Instalar e autorizar</h3>
-  <p>Escolha <strong>um</strong> dos dois caminhos. O <strong>Caminho A</strong> é o mais simples e não exige baixar o código.</p>
-
-  <h4>Caminho A — via npm (recomendado, sem clonar nada)</h4>
-  <ol>
-    <li><strong>Rode o comando de autorização uma primeira vez.</strong> Ele vai falhar de propósito, mas já cria a pasta certa e mostra o caminho dela: <code>npx -p mcp-server-google-forms mcp-server-google-forms-token</code>. Vai aparecer algo como <em>“Não encontrei nenhum 'client_secret*.json' em …/.config/mcp-server-google-forms”</em>. Copie esse caminho.</li>
-    <li><strong>Coloque o <code>client_secret*.json</code> naquela pasta.</strong> Ela é oculta, então use o atalho de “ir para a pasta”: no <strong>Windows</strong>, no Explorer, cole na barra de endereço <code>%USERPROFILE%\.config\mcp-server-google-forms</code> e dê Enter. No <strong>Mac</strong>, no Finder, <code>Cmd + Shift + G</code> e cole <code>~/.config/mcp-server-google-forms</code>. No <strong>Linux</strong>, <code>Ctrl + L</code> e cole o mesmo caminho.</li>
-    <li><strong>Rode o mesmo comando de novo</strong> — agora o navegador abre. Escolha sua conta; na tela <strong>“O Google não verificou este app”</strong> (normal, pois o app é seu), clique em <strong>Avançado</strong> → <strong>Acessar … (não seguro)</strong> e confirme as permissões. No terminal aparece <em>“Pronto. refreshToken salvo…”</em>.</li>
-    <li><strong>Registre no Claude Code:</strong> <code>claude mcp add google-forms -- npx mcp-server-google-forms</code></li>
-  </ol>
-
-  <div class="cite">
-    <p style="margin-top:0"><strong>Por que a pasta fica “oculta”?</strong> O caminho começa com um ponto (<code>.config</code>) e, por isso, a pasta não aparece por padrão no Explorer (Windows) nem no Finder (Mac). Isso é intencional.</p>
-    <p>Programas costumam guardar suas configurações — preferências, credenciais, chaves de acesso — em uma pasta reservada, para não espalhar arquivos pela sua pasta de usuário. Por convenção, essas pastas ficam agrupadas em <code>~/.config</code> (o <code>~</code> representa a sua pasta de usuário), e o ponto no início do nome faz o sistema não exibi-las na navegação normal. No Windows, o caminho equivalente é <code>C:\Users\SeuNome\.config\mcp-server-google-forms</code>, e essa pasta também fica oculta por padrão.</p>
-    <p style="margin-bottom:0">“Oculta” não significa “protegida”: a pasta é sua e pode ser aberta a qualquer momento — foi o que fizemos ao colar o caminho na barra de endereço. O ponto apenas evita que ela apareça junto dos seus documentos. É o local padrão onde ferramentas de linha de comando esperam encontrar esse tipo de arquivo, e por isso o servidor guarda ali o seu <code>client_secret.json</code> e a autorização.</p>
-  </div>
-
-  <h4>Caminho B — via clone do repositório (para quem for mexer no código)</h4>
-  <ol>
-    <li>Clone o <a href="https://github.com/claude-book/mcp-server-google-forms">repositório</a> e rode <code>npm install</code>.</li>
-    <li>Coloque o <code>client_secret*.json</code> na pasta <code>credentials/</code> dentro do projeto (crie-a se não existir).</li>
-    <li>Rode <code>npm run token</code> e autorize no navegador (mesma tela do Google descrita no Caminho A, incluindo o aviso de “app não verificado”).</li>
-    <li>Registre no Claude Code: <code>claude mcp add google-forms -- node "$(pwd)/src/server.js"</code></li>
-  </ol>
-
-  <h3>Passo 3 — Peça ao Claude</h3>
-  <p>Pronto: peça ao Claude, por exemplo, <em>“crie um quiz de 5 perguntas sobre fotossíntese, valendo 2 pontos cada, e me dê o link”</em>. O passo a passo completo, com solução de problemas, está no <a href="https://github.com/claude-book/mcp-server-google-forms#readme">README</a>.</p>
-
-  <h2>Para citar em trabalhos acadêmicos</h2>
-  <p class="cite">
-    Alvarenga da Silva, H. (2026). <em>mcp-server-google-forms: servidor MCP para Google Forms</em>.
-    Zenodo. <a href="https://doi.org/10.5281/zenodo.21296975">https://doi.org/10.5281/zenodo.21296975</a>
-  </p>
+  <section class="cite" style="margin-top:3rem">
+    <p style="margin:0 0 .4rem"><strong>Para citar em trabalhos acadêmicos</strong></p>
+    <p style="margin:0">
+      Alvarenga da Silva, H. (2026). <em>mcp-server-google-forms: servidor MCP para Google Forms</em>.
+      Zenodo. <a href="https://doi.org/10.5281/zenodo.21296975">https://doi.org/10.5281/zenodo.21296975</a>
+    </p>
+  </section>
 
   <footer>
     <p>MIT © 2026 Henrique Alvarenga da Silva · contato: henriquealvarenga@gmail.com</p>
     <nav>
-      <a href="privacidade.html">Privacidade</a>
-      <a href="termos.html">Termos</a>
       <a href="https://github.com/claude-book/mcp-server-google-forms">GitHub</a>
       <a href="https://www.npmjs.com/package/mcp-server-google-forms">npm</a>
+      <a href="revisao-de-codigo.html">Revisão de código</a>
+      <a href="privacidade.html">Privacidade</a>
+      <a href="termos.html">Termos</a>
       <a href="https://doi.org/10.5281/zenodo.21296975">DOI</a>
     </nav>
   </footer>
+
 </div>
 </body>
 </html>

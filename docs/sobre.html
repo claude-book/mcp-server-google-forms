@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sobre o MCP — mcp-server-google-forms</title>
+<link rel="stylesheet" href="styles.css">
+<style>:root { --page: var(--c-sobre); }</style>
+</head>
+<body>
+<div class="wrap page-accent">
+
+  <a class="back" href="index.html">← Início</a>
+
+  <p class="eyebrow">Sobre o MCP</p>
+  <h1>O que é este servidor</h1>
+  <p class="lead">
+    <strong>mcp-server-google-forms</strong> é um servidor MCP local, em Node.js, com
+    <strong>15 ferramentas</strong> que dão ao Claude a capacidade de criar formulários completos numa única
+    operação, montar quizzes com gabarito, organizar seções, publicar e ler respostas — tudo pela conversa.
+  </p>
+
+  <h2>Como funciona</h2>
+  <p>
+    O servidor roda <strong>no seu computador</strong> e conversa com a API oficial do Google Forms
+    usando uma autorização que só você concede — com os <strong>escopos mínimos</strong> (formulários e
+    leitura de respostas; nada de acesso ao Drive inteiro). Nenhum dado passa por servidores de
+    terceiros: é a sua máquina falando diretamente com o Google.
+  </p>
+
+  <h2>O que ele faz (15 ferramentas)</h2>
+  <ul>
+    <li><strong>Criar</strong> — <code>build_form</code> monta o formulário inteiro numa única operação (título, descrição, quiz e até 50 perguntas); <code>create_form</code> cria um vazio.</li>
+    <li><strong>Perguntar</strong> — <code>add_question</code> com 9 tipos: texto curto e longo, escolha única, caixas de seleção, lista suspensa, escala linear, data, hora/duração e avaliação (estrelas, corações, joinhas).</li>
+    <li><strong>Organizar</strong> — seções (<code>add_section</code>), blocos de texto (<code>add_text_item</code>), mover (<code>move_question</code>) e apagar (<code>delete_question</code>) com validação de posição.</li>
+    <li><strong>Editar sem recriar</strong> — <code>update_question</code> e <code>update_form_info</code> preservam o vínculo com respostas já recebidas.</li>
+    <li><strong>Quiz de verdade</strong> — pontos e gabarito por pergunta (<code>set_quiz</code>), com auditoria pós-criação (<code>verify_answer_keys</code>).</li>
+    <li><strong>Publicar e acompanhar</strong> — <code>set_publish</code>, <code>get_form</code> (resumo legível) e <code>list_responses</code> (paginada).</li>
+    <li><strong>Diagnóstico</strong> — <code>auth_status</code> testa as credenciais direto com o Google.</li>
+  </ul>
+  <p>E quando algo dá errado, as mensagens explicam <em>o que fazer</em>, em português — nada de erro técnico cru.</p>
+
+  <h2>Onde ele está publicado</h2>
+  <ul>
+    <li><strong>npm</strong> — instale com um comando, sem clonar nada: <a href="https://www.npmjs.com/package/mcp-server-google-forms">mcp-server-google-forms</a>.</li>
+    <li><strong>MCP Registry oficial</strong> (da Anthropic e da comunidade MCP) — registrado como <code>io.github.claude-book/mcp-server-google-forms</code>.</li>
+    <li><strong>Zenodo (CERN)</strong> — cada versão é arquivada com DOI permanente; citável em trabalhos acadêmicos.</li>
+  </ul>
+
+  <ul class="links" style="margin-top:2rem">
+    <li><a class="primary" href="manual.html">Ir para o Manual de instalação →</a></li>
+    <li><a href="https://github.com/claude-book/mcp-server-google-forms">Ver no GitHub</a></li>
+    <li><a href="revisao-de-codigo.html">Revisão de código</a></li>
+  </ul>
+
+  <footer>
+    <p>MIT © 2026 Henrique Alvarenga da Silva · contato: henriquealvarenga@gmail.com</p>
+    <nav>
+      <a href="index.html">Início</a>
+      <a href="privacidade.html">Privacidade</a>
+      <a href="termos.html">Termos</a>
+      <a href="https://github.com/claude-book/mcp-server-google-forms">GitHub</a>
+    </nav>
+  </footer>
+
+</div>
+</body>
+</html>
