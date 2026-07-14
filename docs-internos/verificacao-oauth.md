@@ -19,7 +19,17 @@ Por que o aviso some só assim: o aviso "app não verificado" depende do **app**
 
 - [x] App em **Produção** (publicado).
 - [x] Henrique já autorizou para si mesmo (setup pessoal funcionando no Mac e no Windows).
+- [x] **Domínio `henriquealvarenga.com` já verificado** no Search Console (propriedade `sc-domain:` — verificação de domínio completa, a que o OAuth exige).
+- [x] **Páginas home/privacidade/termos prontas** (arquivos entregues; ver "Nome do app e URLs" abaixo). Falta o Henrique **subir no repo `henriquealvarenga/mcp` e ligar o GitHub Pages**.
 - [ ] Verificação **ainda não enviada**.
+
+## Nome do app e URLs (decididos)
+
+- **Nome público do app:** **"Formulários para Claude"** (evita "Google" no nome). Deve ser **o mesmo** na Tela de permissão OAuth.
+- **Páginas** hospedadas no repo `henriquealvarenga/mcp` → servidas em:
+  - Página inicial: `https://henriquealvarenga.com/mcp/`
+  - Política de privacidade: `https://henriquealvarenga.com/mcp/privacidade.html`
+  - Termos: `https://henriquealvarenga.com/mcp/termos.html`
 
 ## Dados úteis do projeto
 
@@ -37,8 +47,8 @@ Por que o aviso some só assim: o aviso "app não verificado" depende do **app**
 
 ### Etapa 1 — Domínio próprio e páginas
 O Google **não aceita `github.io`** como domínio autorizado. Usar `henriquealvarenga.com`.
-- [ ] Verificar a posse de `henriquealvarenga.com` no [Google Search Console](https://search.google.com/search-console) (mesma conta Google do projeto).
-- [ ] Hospedar no domínio próprio, públicas: **página inicial**, **política de privacidade** e **termos de uso**. (Os textos já existem no `github.io`; publicar cópias no `henriquealvarenga.com`.)
+- [x] Verificar a posse de `henriquealvarenga.com` no [Google Search Console](https://search.google.com/search-console) — **feito** (propriedade `sc-domain:henriquealvarenga.com`).
+- [~] Hospedar no domínio próprio, públicas: **página inicial**, **política de privacidade** e **termos de uso**. → **Arquivos prontos e entregues** (repo `henriquealvarenga/mcp`). Falta o Henrique subir os 4 arquivos (`index.html`, `privacidade.html`, `termos.html`, `styles.css`) e ligar o **Settings → Pages → branch `main` / root**.
 
 ### Etapa 2 — Tela de permissão OAuth
 Google Cloud → **APIs e serviços → Tela de permissão OAuth** (Branding/Público):
@@ -64,14 +74,14 @@ Google Cloud → **APIs e serviços → Tela de permissão OAuth** (Branding/Pú
 
 ## O que a IA (Claude) vai produzir para o Henrique
 
-Itens de escrita já combinados, a fazer numa próxima sessão:
+Itens de escrita:
 
-1. [ ] **Justificativas dos escopos** — texto pronto para colar no formulário de verificação (prioridade: os dois sensíveis).
-2. [ ] **Política de privacidade atualizada** — a atual precisa citar explicitamente o acesso aos dados do Google e a conformidade com a **Limited Use** do *Google API Services User Data Policy* (requisito da verificação).
+1. [ ] **Justificativas dos escopos** — texto pronto para colar no formulário de verificação (os dois sensíveis). **← próximo item**
+2. [x] **Política de privacidade** — feita (arquivo `privacidade.html` entregue, com a seção *Limited Use*).
 3. [ ] **Roteiro do vídeo** de demonstração.
-4. [ ] (Opcional) **Página inicial** simples no domínio próprio descrevendo o app.
+4. [x] **Página inicial** descrevendo o app — feita (`index.html`).
 
-Sugestão de ordem: **1 + 2 primeiro** (é o que o Google mais examina e destrava o envio).
+Próximo item pendente: **justificativas dos escopos** (item 1) e depois o **roteiro do vídeo** (item 3).
 
 ## Outras frentes do Modelo B (depois da verificação aprovada)
 
@@ -82,4 +92,9 @@ Estas não fazem parte da verificação, mas completam o Modelo B — só "virar
 
 ## Onde retomar
 
-Comece pela **Etapa 1** (verificar o domínio no Search Console — independe da IA) e peça à IA os itens **1 e 2** da lista "O que a IA vai produzir".
+Feito até aqui: domínio verificado; páginas (home/privacidade/termos) prontas e entregues; política com *Limited Use* pronta.
+
+Próximos passos, na ordem:
+1. **Henrique:** subir os 4 arquivos no repo `henriquealvarenga/mcp` e ligar o GitHub Pages; conferir que `https://henriquealvarenga.com/mcp/` abre.
+2. **IA:** escrever as **justificativas dos escopos** (item 1 da lista) e o **roteiro do vídeo** (item 3).
+3. **Henrique:** preencher a Tela de permissão OAuth (nome "Formulários para Claude", as 3 URLs, domínio autorizado) e **enviar para verificação**.
