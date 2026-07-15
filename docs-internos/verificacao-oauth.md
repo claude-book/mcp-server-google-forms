@@ -6,13 +6,21 @@
 
 ---
 
+## 📍 STATUS ATUAL: verificação ENVIADA — aguardando o Google (desde 15/07/2026)
+
+**Nada a fazer agora.** O Google responde por e-mail (henriquealvarenga@gmail.com — olhar também o spam), tipicamente entre dias e algumas semanas. Cenários:
+
+- **Aprovado** → partir para a frente final do Modelo B (itens 4 e 5 abaixo), com a IA.
+- **Pedido de ajuste** → é comum, não é reprovação; trazer o e-mail para a sessão e ajustar rápido.
+- **Silêncio por 3+ semanas** → responder o e-mail de confirmação pedindo status.
+
+⚠️ **Não alternar** o estado de publicação (Produção) nem o tipo de usuário (Externo) durante a análise — muda o processo e atrasa.
+
 ## ⏳ O que FALTA fazer
 
-**Agora (só o Henrique):**
-
 1. [x] **Gravar o vídeo** — feito e no YouTube (não listado): `https://youtu.be/FnDaz1jzVwo` (gravado no Mac, cliente `claude-forms-mcp`, editado no Final Cut, comprimido no Compressor para HD 1080p).
-2. [ ] No **Verification Center**, colar a **justificativa** (Apêndice A), o **link do vídeo** (acima) e **enviar para verificação**. **← PRÓXIMO PASSO**
-3. [ ] **Aguardar o Google** (dias a semanas) e responder eventuais e-mails pedindo ajustes.
+2. [x] **Enviar a verificação** — feito em 15/07/2026, no Verification Center: justificativa (Apêndice A), additional info com o link do vídeo, triagem respondida (No/No/No/No + acknowledgments).
+3. [ ] **Aguardar o resultado do Google** e responder eventuais e-mails pedindo ajustes. **← ESTAMOS AQUI**
 
 **Depois que a verificação for APROVADA (frente final do Modelo B — Henrique + IA):**
 
