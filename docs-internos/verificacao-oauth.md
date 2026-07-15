@@ -10,8 +10,8 @@
 
 **Agora (só o Henrique):**
 
-1. [ ] **Gravar o vídeo** de verificação e subir no YouTube como **"Não listado"**. Roteiro pronto no **Apêndice B**.
-2. [ ] No **Verification Center**, colar a **justificativa** (Apêndice A), o **link do vídeo** e **enviar para verificação**.
+1. [x] **Gravar o vídeo** — feito e no YouTube (não listado): `https://youtu.be/FnDaz1jzVwo` (gravado no Mac, cliente `claude-forms-mcp`, editado no Final Cut, comprimido no Compressor para HD 1080p).
+2. [ ] No **Verification Center**, colar a **justificativa** (Apêndice A), o **link do vídeo** (acima) e **enviar para verificação**. **← PRÓXIMO PASSO**
 3. [ ] **Aguardar o Google** (dias a semanas) e responder eventuais e-mails pedindo ajustes.
 
 **Depois que a verificação for APROVADA (frente final do Modelo B — Henrique + IA):**
